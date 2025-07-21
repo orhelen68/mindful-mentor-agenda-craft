@@ -155,60 +155,64 @@ export default function CreateAgenda() {
     <div className="min-h-screen bg-background">
       <div className="container mx-auto p-6 space-y-6">
         {/* Header */}
-        <div className="flex items-center gap-4">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => navigate('/')}
-            className="flex items-center gap-2"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold">Create Training Agenda</h1>
-            <p className="text-muted-foreground">
-              Build your training agenda based on requirements and available modules
-            </p>
+        <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 rounded-2xl p-6 border border-green-100 dark:border-green-800">
+          <div className="flex items-center gap-4">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate('/')}
+              className="flex items-center gap-2 bg-white/50 border-green-200 hover:bg-green-50"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back
+            </Button>
+            <div>
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                Create Training Agenda
+              </h1>
+              <p className="text-muted-foreground mt-1">
+                Build your training agenda based on requirements and available modules
+              </p>
+            </div>
           </div>
         </div>
 
         {/* Training Requirements Summary */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <BookOpen className="h-5 w-5" />
+        <Card className="shadow-xl bg-gradient-to-br from-white to-gray-50/50 dark:from-gray-900 dark:to-gray-800/50 border-gray-200 dark:border-gray-700">
+          <CardHeader className="bg-gradient-to-r from-blue-50/50 to-indigo-50/50 dark:from-blue-950/20 dark:to-indigo-950/20 rounded-t-lg">
+            <CardTitle className="flex items-center gap-2 bg-gradient-to-r from-blue-700 to-indigo-700 bg-clip-text text-transparent">
+              <BookOpen className="h-5 w-5 text-blue-600" />
               {requirement.training_title}
             </CardTitle>
             <CardDescription>{requirement.description}</CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-              <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm">
+          <CardContent className="pt-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <div className="flex items-center gap-2 bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-950/20 dark:to-amber-950/20 p-3 rounded-lg border border-orange-100 dark:border-orange-800">
+                <Clock className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+                <span className="text-sm text-orange-700 dark:text-orange-300">
                   Duration: {requirement.constraints?.duration || 'Not specified'} minutes
                 </span>
               </div>
-              <div className="flex items-center gap-2">
-                <Users className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm">
+              <div className="flex items-center gap-2 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20 p-3 rounded-lg border border-purple-100 dark:border-purple-800">
+                <Users className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                <span className="text-sm text-purple-700 dark:text-purple-300">
                   Experience: {requirement.target_audience?.experienceLevel || 'Not specified'}
                 </span>
               </div>
-              <div className="flex items-center gap-2">
-                <Badge variant="outline">
+              <div className="flex items-center justify-center bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-teal-950/20 dark:to-cyan-950/20 p-3 rounded-lg border border-teal-100 dark:border-teal-800">
+                <Badge className="bg-gradient-to-r from-teal-500 to-cyan-500 text-white">
                   {requirement.delivery_preferences?.format || 'Any format'}
                 </Badge>
               </div>
             </div>
             
             {requirement.mindset_focus?.primaryTopics && (
-              <div>
-                <p className="text-sm font-medium mb-2">Primary Topics:</p>
+              <div className="bg-gradient-to-r from-slate-50 to-gray-50 dark:from-slate-950/20 dark:to-gray-950/20 p-4 rounded-lg border border-slate-100 dark:border-slate-800">
+                <p className="text-sm font-medium mb-3 text-slate-700 dark:text-slate-300">Primary Topics:</p>
                 <div className="flex flex-wrap gap-2">
                   {requirement.mindset_focus.primaryTopics.map((topic, index) => (
-                    <Badge key={index} variant="default">
+                    <Badge key={index} className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white">
                       {topic}
                     </Badge>
                   ))}

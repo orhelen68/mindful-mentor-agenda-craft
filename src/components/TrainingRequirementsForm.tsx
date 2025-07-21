@@ -403,9 +403,9 @@ export function TrainingRequirementsForm({ onSuccess }: { onSuccess?: () => void
                             size="icon"
                             onClick={() => removeObjective(index)}
                             disabled={objectiveFields.length === 1}
-                            className="h-11 w-11 bg-white/50 border-purple-200 hover:bg-purple-50"
+                            className="h-11 w-11 bg-white border-gray-200 hover:bg-gray-50"
                           >
-                            <Trash2 className="h-4 w-4" />
+                            <Trash2 className="h-4 w-4 text-green-600" />
                           </Button>
                         </div>
                       ))}
@@ -453,9 +453,9 @@ export function TrainingRequirementsForm({ onSuccess }: { onSuccess?: () => void
                             size="icon"
                             onClick={() => removePrimaryTopic(index)}
                             disabled={primaryTopicFields.length === 1}
-                            className="h-11 w-11 bg-white/50 border-teal-200 hover:bg-teal-50"
+                            className="h-11 w-11 bg-white border-gray-200 hover:bg-gray-50"
                           >
-                            <Trash2 className="h-4 w-4" />
+                            <Trash2 className="h-4 w-4 text-green-600" />
                           </Button>
                         </div>
                       ))}
@@ -500,9 +500,9 @@ export function TrainingRequirementsForm({ onSuccess }: { onSuccess?: () => void
                             variant="outline"
                             size="icon"
                             onClick={() => removeSecondaryTopic(index)}
-                            className="h-11 w-11 bg-white/50 border-slate-200 hover:bg-slate-50"
+                            className="h-11 w-11 bg-white border-gray-200 hover:bg-gray-50"
                           >
-                            <Trash2 className="h-4 w-4" />
+                            <Trash2 className="h-4 w-4 text-green-600" />
                           </Button>
                         </div>
                       ))}

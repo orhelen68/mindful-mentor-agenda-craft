@@ -139,9 +139,9 @@ function SortableTimeslot({
               variant="outline"
               size="sm"
               onClick={onDelete}
-              className="text-destructive hover:text-destructive"
+              className="bg-white border-gray-200 hover:bg-gray-50"
             >
-              <Trash2 className="h-4 w-4" />
+              <Trash2 className="h-4 w-4 text-green-600" />
             </Button>
           </div>
         </CardHeader>

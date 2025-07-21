@@ -80,7 +80,7 @@ export function TrainingRequirementsManagement() {
             <p className="text-muted-foreground mt-1">Manage your training requirements and create agendas</p>
           </div>
           <div className="flex gap-3">
-            <Button onClick={() => navigate('/?tab=requirements-form')} variant="outline" className="bg-white/50 border-blue-200 hover:bg-blue-50">
+            <Button onClick={() => navigate('/?tab=requirements-form')} className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white">
               <Plus className="w-4 h-4 mr-2" />
               Add Training Requirements
             </Button>
@@ -296,13 +296,13 @@ export function TrainingRequirementsManagement() {
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
                           <Button
-                            variant="destructive"
+                            variant="outline"
                             size="icon"
                             onClick={() => handleDelete(requirement.id)}
                             disabled={deleteLoading === requirement.id}
-                            className="bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600"
+                            className="bg-white border-gray-200 hover:bg-gray-50"
                           >
-                            {deleteLoading === requirement.id ? 'Deleting...' : <Trash2 className="w-4 h-4" />}
+                            {deleteLoading === requirement.id ? 'Deleting...' : <Trash2 className="w-4 h-4 text-green-600" />}
                           </Button>
                         </AlertDialogTrigger>
                       <AlertDialogContent>

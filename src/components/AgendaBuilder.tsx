@@ -174,13 +174,15 @@ export function AgendaBuilder({
   return (
     <div className="space-y-6">
       {/* Duration Status */}
-      <Card>
+      <Card className="shadow-xl bg-gradient-to-br from-white to-gray-50/50 dark:from-gray-900 dark:to-gray-800/50 border-gray-200 dark:border-gray-700">
         <CardContent className="pt-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <Clock className="h-5 w-5" />
+              <div className="w-12 h-12 bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-950/20 dark:to-amber-950/20 rounded-full flex items-center justify-center border border-orange-100 dark:border-orange-800">
+                <Clock className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+              </div>
               <div>
-                <p className="font-medium">
+                <p className="font-medium text-orange-700 dark:text-orange-300">
                   Total Duration: {totalDuration} minutes
                 </p>
                 <p className="text-sm text-muted-foreground">
@@ -188,10 +190,10 @@ export function AgendaBuilder({
                 </p>
               </div>
             </div>
-            <div className={`px-3 py-1 rounded-full text-sm font-medium ${
-              durationStatus === 'good' ? 'bg-green-100 text-green-800' :
-              durationStatus === 'short' ? 'bg-yellow-100 text-yellow-800' :
-              'bg-red-100 text-red-800'
+            <div className={`px-4 py-2 rounded-full text-sm font-medium ${
+              durationStatus === 'good' ? 'bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border border-green-200' :
+              durationStatus === 'short' ? 'bg-gradient-to-r from-yellow-100 to-orange-100 text-yellow-800 border border-yellow-200' :
+              'bg-gradient-to-r from-red-100 to-pink-100 text-red-800 border border-red-200'
             }`}>
               {durationStatus === 'good' ? 'On Track' :
                durationStatus === 'short' ? 'Too Short' : 'Too Long'}

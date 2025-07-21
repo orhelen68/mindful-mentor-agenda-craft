@@ -468,7 +468,7 @@ export function TrainingModulesManagement() {
                     <CardTitle className="text-lg line-clamp-2 bg-gradient-to-r from-purple-700 to-pink-700 bg-clip-text text-transparent">
                       {module.module_title}
                     </CardTitle>
-                    <Badge className="mt-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white border-0">
+                    <Badge className="mt-2 bg-gradient-to-r from-blue-300 to-sky-300 text-blue-800 border-0">
                       {module.category}
                     </Badge>
                   </div>
@@ -530,7 +530,7 @@ export function TrainingModulesManagement() {
                                   <CardContent className="space-y-3 text-sm">
                                     <div className="bg-white/50 dark:bg-gray-800/50 p-3 rounded-lg">
                                       <strong className="text-blue-600 dark:text-blue-400">Category:</strong> 
-                                      <Badge className="ml-2 bg-gradient-to-r from-emerald-500 to-teal-500">{selectedModule.category}</Badge>
+                                      <Badge className="ml-2 bg-gradient-to-r from-blue-300 to-sky-300 text-blue-800">{selectedModule.category}</Badge>
                                     </div>
                                     <div className="bg-white/50 dark:bg-gray-800/50 p-3 rounded-lg">
                                       <strong className="text-blue-600 dark:text-blue-400">Description:</strong> 
@@ -620,12 +620,12 @@ export function TrainingModulesManagement() {
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
                         <Button
-                          variant="destructive"
+                          variant="outline"
                           size="icon"
                           disabled={deleteLoading === module.id}
-                          className="bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600"
+                          className="bg-white border-gray-200 hover:bg-gray-50"
                         >
-                          {deleteLoading === module.id ? 'Deleting...' : <Trash2 className="w-4 h-4" />}
+                          {deleteLoading === module.id ? 'Deleting...' : <Trash2 className="w-4 h-4 text-green-600" />}
                         </Button>
                       </AlertDialogTrigger>
                       <AlertDialogContent>
