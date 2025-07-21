@@ -8,9 +8,13 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Card, CardContent } from '@/components/ui/card';
-import { Plus, Trash2 } from 'lucide-react';
-import { trainingRequirementsService } from '@/services/trainingRequirementsService';
+import { Plus, Trash2, Brain } from 'lucide-react';
+import { trainingRequirementsService, TrainingRequirement } from '@/services/trainingRequirementsService';
+import { trainingModulesService, TrainingModule } from '@/services/trainingModulesService';
+import { trainingAgendasService, TrainingAgendaFormData } from '@/services/trainingAgendasService';
+import { AIGeneratedAgendaDialog } from '@/components/AIGeneratedAgendaDialog';
 import { useToast } from '@/hooks/use-toast';
+import { useEffect } from 'react';
 
 const trainingRequirementsSchema = z.object({
   trainingID: z.string().min(1, 'Training ID is required'),
@@ -39,6 +43,9 @@ type TrainingRequirementsFormData = z.infer<typeof trainingRequirementsSchema>;
 
 export function TrainingRequirementsForm({ onSuccess }: { onSuccess?: () => void }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showAIDialog, setShowAIDialog] = useState(false);
+  const [availableModules, setAvailableModules] = useState<TrainingModule[]>([]);
+  const [savedRequirement, setSavedRequirement] = useState<TrainingRequirement | null>(null);
   const { toast } = useToast();
 
   const form = useForm<TrainingRequirementsFormData>({
@@ -82,6 +89,21 @@ export function TrainingRequirementsForm({ onSuccess }: { onSuccess?: () => void
     name: 'mindsetFocus.secondaryTopics' as const,
   });
 
+  // Load available modules for AI generation
+  const loadModules = async () => {
+    try {
+      const modules = await trainingModulesService.getTrainingModules();
+      setAvailableModules(modules);
+    } catch (error) {
+      console.error('Failed to load modules:', error);
+    }
+  };
+
+  // Load modules on component mount
+  useEffect(() => {
+    loadModules();
+  }, []);
+
   const onSubmit = async (data: TrainingRequirementsFormData) => {
     setIsSubmitting(true);
     try {
@@ -109,7 +131,9 @@ export function TrainingRequirementsForm({ onSuccess }: { onSuccess?: () => void
         },
       };
       
-      await trainingRequirementsService.addTrainingRequirement(serviceData);
+      const savedData = await trainingRequirementsService.addTrainingRequirement(serviceData);
+      setSavedRequirement(savedData);
+      
       toast({
         title: 'Success',
         description: 'Training requirements saved successfully!',
@@ -125,6 +149,24 @@ export function TrainingRequirementsForm({ onSuccess }: { onSuccess?: () => void
       });
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleAIAgendaGenerated = async (agenda: Omit<TrainingAgendaFormData, 'id' | 'created_at' | 'updated_at'>) => {
+    try {
+      await trainingAgendasService.addTrainingAgenda(agenda);
+      toast({
+        title: "AI Agenda Created!",
+        description: "Your training agenda has been generated and saved successfully.",
+      });
+      // Navigate to view the created agenda
+      window.location.href = '/create-agenda';
+    } catch (error) {
+      toast({
+        title: "Error saving agenda",
+        description: "Please try again later.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -449,11 +491,34 @@ export function TrainingRequirementsForm({ onSuccess }: { onSuccess?: () => void
                 >
                   Create Training Agenda
                 </Button>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  className="w-full h-12 text-lg bg-gradient-to-r from-purple-50 to-blue-50 border-purple-200 hover:from-purple-100 hover:to-blue-100"
+                  onClick={() => setShowAIDialog(true)}
+                  disabled={!savedRequirement}
+                >
+                  <Brain className="h-5 w-5 mr-2" />
+                  AI Generate Training Agenda
+                </Button>
+                {!savedRequirement && (
+                  <p className="text-xs text-muted-foreground text-center">
+                    Save training requirements first to enable AI generation
+                  </p>
+                )}
               </div>
             </form>
           </Form>
         </CardContent>
       </Card>
+
+      <AIGeneratedAgendaDialog
+        open={showAIDialog}
+        onOpenChange={setShowAIDialog}
+        requirement={savedRequirement}
+        availableModules={availableModules}
+        onAgendaGenerated={handleAIAgendaGenerated}
+      />
     </div>
   );
 }
