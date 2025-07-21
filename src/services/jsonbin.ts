@@ -56,24 +56,75 @@ class JSONBinService {
 
   async getTrainingRequirements(): Promise<TrainingRequirement[]> {
     try {
-      console.log('Fetching training requirements from:', `${JSONBIN_BASE_URL}/b/${TRAINING_REQUIREMENTS_BIN_ID}`);
-      const response = await fetch(`${JSONBIN_BASE_URL}/b/${TRAINING_REQUIREMENTS_BIN_ID}/latest`, {
+      console.log('Fetching training requirements from:', `${JSONBIN_BASE_URL}/b/${TRAINING_REQUIREMENTS_BIN_ID}/latest`);
+      console.log('Headers:', this.headers);
+      
+      // Try different fetch configurations
+      const fetchOptions = {
         method: 'GET',
-        headers: this.headers,
-        mode: 'cors',
-      });
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Master-Key': MASTER_KEY,
+          'X-Bin-Meta': 'false',
+        },
+      };
+      
+      console.log('Fetch options:', fetchOptions);
+      
+      const response = await fetch(`${JSONBIN_BASE_URL}/b/${TRAINING_REQUIREMENTS_BIN_ID}/latest`, fetchOptions);
+      
+      console.log('Response received:', response);
+      console.log('Response status:', response.status);
+      console.log('Response headers:', [...response.headers.entries()]);
       
       if (!response.ok) {
         console.error('Response not OK:', response.status, response.statusText);
-        throw new Error(`Failed to fetch training requirements: ${response.status}`);
+        const errorText = await response.text();
+        console.error('Error response body:', errorText);
+        throw new Error(`Failed to fetch training requirements: ${response.status} - ${errorText}`);
       }
       
       const data = await response.json();
-      console.log('Fetched data:', data);
+      console.log('Fetched data structure:', data);
+      console.log('Data.record:', data.record);
+      console.log('Is data.record an array?', Array.isArray(data.record));
+      
       return Array.isArray(data.record) ? data.record : (data.record ? [data.record] : []);
     } catch (error) {
-      console.error('Error fetching training requirements:', error);
-      return [];
+      console.error('Detailed error fetching training requirements:', error);
+      console.error('Error name:', error.name);
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
+      
+      // Return sample data for testing
+      console.log('Returning sample data for testing purposes');
+      return [
+        {
+          id: 'sample_1',
+          trainingID: 'TRN001',
+          trainingTitle: 'Sample Training - Connection Test',
+          description: 'This is sample data while we debug the JSONbin connection',
+          targetAudience: {
+            experienceLevel: 'intermediate' as const,
+            industryContext: 'Technology'
+          },
+          constraints: {
+            duration: 120,
+            interactionLevel: 'high' as const
+          },
+          mindsetFocus: {
+            learningObjectives: ['Test objective 1', 'Test objective 2'],
+            primaryTopics: ['Leadership', 'Communication'],
+            secondaryTopics: ['Teamwork']
+          },
+          deliveryPreferences: {
+            format: 'in-person' as const,
+            groupSize: 20
+          },
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        }
+      ];
     }
   }
 
@@ -115,24 +166,67 @@ class JSONBinService {
 
   async getTrainingModules(): Promise<TrainingModule[]> {
     try {
-      console.log('Fetching training modules from:', `${JSONBIN_BASE_URL}/b/${TRAINING_MODULES_BIN_ID}`);
-      const response = await fetch(`${JSONBIN_BASE_URL}/b/${TRAINING_MODULES_BIN_ID}/latest`, {
+      console.log('Fetching training modules from:', `${JSONBIN_BASE_URL}/b/${TRAINING_MODULES_BIN_ID}/latest`);
+      console.log('Headers:', this.headers);
+      
+      const fetchOptions = {
         method: 'GET',
-        headers: this.headers,
-        mode: 'cors',
-      });
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Master-Key': MASTER_KEY,
+          'X-Bin-Meta': 'false',
+        },
+      };
+      
+      console.log('Fetch options:', fetchOptions);
+      
+      const response = await fetch(`${JSONBIN_BASE_URL}/b/${TRAINING_MODULES_BIN_ID}/latest`, fetchOptions);
+      
+      console.log('Response received:', response);
+      console.log('Response status:', response.status);
+      console.log('Response headers:', [...response.headers.entries()]);
       
       if (!response.ok) {
         console.error('Response not OK:', response.status, response.statusText);
-        throw new Error(`Failed to fetch training modules: ${response.status}`);
+        const errorText = await response.text();
+        console.error('Error response body:', errorText);
+        throw new Error(`Failed to fetch training modules: ${response.status} - ${errorText}`);
       }
       
       const data = await response.json();
-      console.log('Fetched modules data:', data);
+      console.log('Fetched modules data structure:', data);
+      console.log('Modules data.record:', data.record);
+      console.log('Is modules data.record an array?', Array.isArray(data.record));
+      
       return Array.isArray(data.record) ? data.record : (data.record ? [data.record] : []);
     } catch (error) {
-      console.error('Error fetching training modules:', error);
-      return [];
+      console.error('Detailed error fetching training modules:', error);
+      console.error('Error name:', error.name);
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
+      
+      // Return sample data for testing
+      console.log('Returning sample modules data for testing purposes');
+      return [
+        {
+          id: 'sample_mod_1',
+          title: 'Sample Module - Connection Test',
+          description: 'This is sample module data while we debug the JSONbin connection',
+          objectives: ['Test objective 1', 'Test objective 2'],
+          duration: 60,
+          materials: ['Sample material 1', 'Sample material 2'],
+          activities: [
+            {
+              type: 'discussion' as const,
+              description: 'Sample discussion activity',
+              duration: 30
+            }
+          ],
+          tags: ['sample', 'test'],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        }
+      ];
     }
   }
 
