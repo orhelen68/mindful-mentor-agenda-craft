@@ -80,7 +80,7 @@ export function TrainingRequirementsManagement() {
             <p className="text-muted-foreground mt-1">Manage your training requirements and create agendas</p>
           </div>
           <div className="flex gap-3">
-            <Button onClick={() => navigate('/?tab=requirements-form')} className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white">
+            <Button onClick={() => navigate('/?tab=add-requirements')} className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white">
               <Plus className="w-4 h-4 mr-2" />
               Add Training Requirements
             </Button>
@@ -106,7 +106,7 @@ export function TrainingRequirementsManagement() {
               <p className="text-muted-foreground mb-4">
                 Create your first training requirement using the form to get started.
               </p>
-              <Button onClick={() => navigate('/?tab=requirements-form')} className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700">
+              <Button onClick={() => navigate('/?tab=add-requirements')} className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700">
                 <Plus className="w-4 h-4 mr-2" />
                 Add Training Requirements
               </Button>

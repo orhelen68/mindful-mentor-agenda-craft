@@ -31,7 +31,7 @@ const Index = () => {
         </Card>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="requirements-management" className="flex items-center gap-2">
               <Settings className="w-4 h-4" />
               Propose Training Agenda
@@ -39,6 +39,10 @@ const Index = () => {
             <TabsTrigger value="modules-management" className="flex items-center gap-2">
               <BookOpen className="w-4 h-4" />
               Training Module Library
+            </TabsTrigger>
+            <TabsTrigger value="add-requirements" className="flex items-center gap-2">
+              <FileText className="w-4 h-4" />
+              Add Training Requirements
             </TabsTrigger>
           </TabsList>
 
@@ -48,6 +52,10 @@ const Index = () => {
 
           <TabsContent value="modules-management" className="mt-6">
             <TrainingModulesManagement />
+          </TabsContent>
+
+          <TabsContent value="add-requirements" className="mt-6">
+            <TrainingRequirementsForm />
           </TabsContent>
         </Tabs>
       </div>

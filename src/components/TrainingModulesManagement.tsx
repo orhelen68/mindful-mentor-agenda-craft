@@ -348,6 +348,260 @@ export function TrainingModulesManagement() {
           )}
         />
 
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="facilitator"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Facilitator Notes</FormLabel>
+                <FormControl>
+                  <Textarea {...field} placeholder="Notes for facilitator..." />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="participant"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Participant Notes</FormLabel>
+                <FormControl>
+                  <Textarea {...field} placeholder="Notes for participants..." />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <FormField
+            control={form.control}
+            name="duration"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Duration (minutes)</FormLabel>
+                <FormControl>
+                  <Input 
+                    {...field} 
+                    type="number" 
+                    onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                    placeholder="60" 
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="delivery_method.format"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Format</FormLabel>
+                <FormControl>
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select format" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="exercise">Exercise</SelectItem>
+                      <SelectItem value="presentation">Presentation</SelectItem>
+                      <SelectItem value="discussion">Discussion</SelectItem>
+                      <SelectItem value="workshop">Workshop</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="delivery_method.breakout"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Breakout Sessions</FormLabel>
+                <FormControl>
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select option" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="yes">Yes</SelectItem>
+                      <SelectItem value="no">No</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <FormField
+            control={form.control}
+            name="group_size.min"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Min Group Size</FormLabel>
+                <FormControl>
+                  <Input 
+                    {...field} 
+                    type="number" 
+                    onChange={(e) => field.onChange(parseInt(e.target.value) || 1)}
+                    placeholder="6" 
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="group_size.max"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Max Group Size</FormLabel>
+                <FormControl>
+                  <Input 
+                    {...field} 
+                    type="number" 
+                    onChange={(e) => field.onChange(parseInt(e.target.value) || 1)}
+                    placeholder="20" 
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="group_size.optimal"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Optimal Group Size</FormLabel>
+                <FormControl>
+                  <Input 
+                    {...field} 
+                    type="number" 
+                    onChange={(e) => field.onChange(parseInt(e.target.value) || 1)}
+                    placeholder="12" 
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <div className="space-y-4">
+          <div className="flex justify-between items-center">
+            <FormLabel>Tags</FormLabel>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => appendTag({ value: '' })}
+            >
+              <Plus className="w-4 h-4 mr-1" />
+              Add Tag
+            </Button>
+          </div>
+          <div className="space-y-2">
+            {tagFields.map((field, index) => (
+              <div key={field.id} className="flex gap-2">
+                <FormField
+                  control={form.control}
+                  name={`tags.${index}.value`}
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormControl>
+                        <Input {...field} placeholder="Enter tag..." />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => removeTag(index)}
+                  className="bg-white border-gray-200 hover:bg-gray-50"
+                >
+                  <Trash2 className="w-4 h-4 text-green-600" />
+                </Button>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <div className="flex justify-between items-center">
+            <FormLabel>Mindset Topics</FormLabel>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => appendMindset({ value: '' })}
+            >
+              <Plus className="w-4 h-4 mr-1" />
+              Add Topic
+            </Button>
+          </div>
+          <div className="space-y-2">
+            {mindsetFields.map((field, index) => (
+              <div key={field.id} className="flex gap-2">
+                <FormField
+                  control={form.control}
+                  name={`mindset_topics.${index}.value`}
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormControl>
+                        <Input {...field} placeholder="Enter mindset topic..." />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => removeMindset(index)}
+                  className="bg-white border-gray-200 hover:bg-gray-50"
+                >
+                  <Trash2 className="w-4 h-4 text-green-600" />
+                </Button>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <FormField
+          control={form.control}
+          name="delivery_notes"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Delivery Notes</FormLabel>
+              <FormControl>
+                <Textarea {...field} placeholder="Additional delivery notes..." />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         <div className="flex justify-end gap-2">
           <Button type="button" variant="outline" onClick={() => {
             setShowAddDialog(false);
@@ -423,9 +677,9 @@ export function TrainingModulesManagement() {
           </CardContent>
         </Card>
 
-        <Card className="md:col-span-3 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 border-green-100 dark:border-green-800">
+        <Card className="md:col-span-3 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border-blue-100 dark:border-blue-800">
           <CardHeader className="pb-3">
-            <CardTitle className="text-green-700 dark:text-green-300 text-sm">Search by Tags or Content</CardTitle>
+            <CardTitle className="text-blue-700 dark:text-blue-300 text-sm">Search by Tags or Content</CardTitle>
           </CardHeader>
           <CardContent>
             <Input
@@ -465,12 +719,12 @@ export function TrainingModulesManagement() {
               <CardHeader className="pb-3 bg-gradient-to-r from-purple-50/50 to-pink-50/50 dark:from-purple-950/20 dark:to-pink-950/20 rounded-t-lg">
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
+                    <div className="text-sm text-muted-foreground mb-1">
+                      {module.category}
+                    </div>
                     <CardTitle className="text-lg line-clamp-2 bg-gradient-to-r from-purple-700 to-pink-700 bg-clip-text text-transparent">
                       {module.module_title}
                     </CardTitle>
-                    <Badge className="mt-2 bg-gradient-to-r from-blue-300 to-sky-300 text-blue-800 border-0">
-                      {module.category}
-                    </Badge>
                   </div>
                 </div>
               </CardHeader>
@@ -610,7 +864,7 @@ export function TrainingModulesManagement() {
                         variant="outline" 
                         size="sm" 
                         onClick={() => startEdit(module)} 
-                        className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/30 border-green-200 dark:border-green-700 hover:from-green-100 hover:to-emerald-100 dark:hover:from-green-900/50 dark:hover:to-emerald-900/50"
+                        className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 border-blue-200 dark:border-blue-700 hover:from-blue-100 hover:to-indigo-100 dark:hover:from-blue-900/50 dark:hover:to-indigo-900/50"
                       >
                         <Edit className="w-4 h-4 mr-1" />
                         Edit
