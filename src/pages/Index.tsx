@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { TrainingRequirementsForm } from '@/components/TrainingRequirementsForm';
@@ -7,7 +8,15 @@ import { TrainingModulesManagement } from '@/components/TrainingModulesManagemen
 import { BookOpen, Settings, FileText } from 'lucide-react';
 
 const Index = () => {
-  const [activeTab, setActiveTab] = useState('requirements-form');
+  const [searchParams] = useSearchParams();
+  const tabFromUrl = searchParams.get('tab');
+  const [activeTab, setActiveTab] = useState(tabFromUrl || 'requirements-form');
+
+  useEffect(() => {
+    if (tabFromUrl) {
+      setActiveTab(tabFromUrl);
+    }
+  }, [tabFromUrl]);
 
   return (
     <div className="min-h-screen bg-background">
