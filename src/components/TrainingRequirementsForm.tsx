@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Card, CardContent } from '@/components/ui/card';
 import { Plus, Trash2 } from 'lucide-react';
-import { jsonBinService } from '@/services/jsonbin';
+import { trainingRequirementsService } from '@/services/trainingRequirementsService';
 import { useToast } from '@/hooks/use-toast';
 
 const trainingRequirementsSchema = z.object({
@@ -85,18 +85,31 @@ export function TrainingRequirementsForm({ onSuccess }: { onSuccess?: () => void
   const onSubmit = async (data: TrainingRequirementsFormData) => {
     setIsSubmitting(true);
     try {
-      // Filter out empty strings
-      const cleanedData = {
-        ...data,
-        mindsetFocus: {
-          ...data.mindsetFocus,
+      // Transform data to match service interface
+      const serviceData = {
+        training_id: data.trainingID,
+        training_title: data.trainingTitle,
+        description: data.description,
+        target_audience: {
+          experienceLevel: data.targetAudience.experienceLevel,
+          industryContext: data.targetAudience.industryContext,
+        },
+        constraints: {
+          duration: data.constraints.duration,
+          interactionLevel: data.constraints.interactionLevel,
+        },
+        mindset_focus: {
           learningObjectives: data.mindsetFocus.learningObjectives.map(obj => obj.value).filter(val => val.trim() !== ''),
           primaryTopics: data.mindsetFocus.primaryTopics.map(topic => topic.value).filter(val => val.trim() !== ''),
           secondaryTopics: data.mindsetFocus.secondaryTopics.map(topic => topic.value).filter(val => val.trim() !== ''),
-        }
+        },
+        delivery_preferences: {
+          format: data.deliveryPreferences.format,
+          groupSize: data.deliveryPreferences.groupSize,
+        },
       };
       
-      await jsonBinService.addTrainingRequirement(cleanedData as any);
+      await trainingRequirementsService.addTrainingRequirement(serviceData);
       toast({
         title: 'Success',
         description: 'Training requirements saved successfully!',
@@ -107,7 +120,7 @@ export function TrainingRequirementsForm({ onSuccess }: { onSuccess?: () => void
       console.error('Error saving requirements:', error);
       toast({
         title: 'Error',
-        description: 'Failed to save training requirements. Please check your internet connection.',
+        description: 'Failed to save training requirements. Please check your connection.',
         variant: 'destructive',
       });
     } finally {

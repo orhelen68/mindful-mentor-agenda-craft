@@ -74,6 +74,48 @@ export type Database = {
         }
         Relationships: []
       }
+      training_requirements: {
+        Row: {
+          constraints: Json
+          created_at: string
+          delivery_preferences: Json
+          description: string
+          id: string
+          mindset_focus: Json
+          target_audience: Json
+          training_id: string
+          training_title: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          constraints: Json
+          created_at?: string
+          delivery_preferences: Json
+          description: string
+          id?: string
+          mindset_focus: Json
+          target_audience: Json
+          training_id: string
+          training_title: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          constraints?: Json
+          created_at?: string
+          delivery_preferences?: Json
+          description?: string
+          id?: string
+          mindset_focus?: Json
+          target_audience?: Json
+          training_id?: string
+          training_title?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

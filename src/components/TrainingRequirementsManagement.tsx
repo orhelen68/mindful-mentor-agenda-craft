@@ -3,50 +3,33 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { Trash2, Eye, Clock, Users, Settings } from 'lucide-react';
-import { jsonBinService, TrainingRequirement, getRequirementsCredentials } from '@/services/jsonbin';
-import { useToast } from '@/hooks/use-toast';
+import { Trash2, Eye, FileText, Clock, Users, Target } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { JSONBinCredentialsDialog, JSONBinCredentials } from './JSONBinCredentialsDialog';
+import { trainingRequirementsService, TrainingRequirement } from '@/services/trainingRequirementsService';
+import { useToast } from '@/hooks/use-toast';
 
 export function TrainingRequirementsManagement() {
   const [requirements, setRequirements] = useState<TrainingRequirement[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedRequirement, setSelectedRequirement] = useState<TrainingRequirement | null>(null);
   const [deleteLoading, setDeleteLoading] = useState<string | null>(null);
-  const [showCredentialsDialog, setShowCredentialsDialog] = useState(false);
   const { toast } = useToast();
 
   const loadRequirements = async () => {
-    // Check if credentials exist
-    const credentials = getRequirementsCredentials();
-    if (!credentials) {
-      setShowCredentialsDialog(true);
-      return;
-    }
-
     setLoading(true);
     try {
-      const data = await jsonBinService.getTrainingRequirements();
+      const data = await trainingRequirementsService.getTrainingRequirements();
       setRequirements(data);
     } catch (error) {
       console.error('Error loading requirements:', error);
       toast({
         title: "Error",
-        description: "Failed to load training requirements. Please check your credentials.",
+        description: "Failed to load training requirements.",
         variant: "destructive",
       });
-      // Show credentials dialog if there's an error
-      setShowCredentialsDialog(true);
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleCredentialsSet = (credentials: JSONBinCredentials) => {
-    // Credentials are already saved in localStorage by the dialog
-    // Now try to load the requirements
-    loadRequirements();
   };
 
   useEffect(() => {
@@ -56,7 +39,7 @@ export function TrainingRequirementsManagement() {
   const handleDelete = async (id: string) => {
     setDeleteLoading(id);
     try {
-      await jsonBinService.deleteTrainingRequirement(id);
+      await trainingRequirementsService.deleteTrainingRequirement(id);
       setRequirements(prev => prev.filter(req => req.id !== id));
       toast({
         title: 'Success',
@@ -83,189 +66,180 @@ export function TrainingRequirementsManagement() {
   };
 
   return (
-    <>
-      <JSONBinCredentialsDialog
-        open={showCredentialsDialog}
-        onOpenChange={setShowCredentialsDialog}
-        onCredentialsSet={handleCredentialsSet}
-        type="requirements"
-      />
-      
-      <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-bold">Training Requirements Management</h2>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setShowCredentialsDialog(true)}
-              className="flex items-center gap-2"
-            >
-              <Settings className="h-4 w-4" />
-              Configure JSONBin
-            </Button>
-            <Button onClick={loadRequirements} variant="outline">
-              Refresh
-            </Button>
-          </div>
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold">Training Requirements Management</h2>
+        <Button onClick={loadRequirements} variant="outline">
+          Refresh
+        </Button>
+      </div>
+
+      {loading ? (
+        <div className="flex items-center justify-center h-64">
+          <div className="text-lg">Loading training requirements...</div>
         </div>
-
-        {loading ? (
-          <div className="flex items-center justify-center h-64">
-            <div className="text-lg">Loading training requirements...</div>
-          </div>
-        ) : requirements.length === 0 ? (
-          <Card>
-            <CardContent className="flex items-center justify-center h-64">
-              <div className="text-center">
-                <h3 className="text-lg font-semibold mb-2">No Training Requirements Found</h3>
-                <p className="text-muted-foreground">
-                  {getRequirementsCredentials() 
-                    ? 'Create your first training requirement to get started.'
-                    : 'Please configure your JSONBin credentials to view training requirements.'
-                  }
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="grid gap-4">
-            {requirements.map((requirement) => (
-              <Card key={requirement.id}>
-                <CardHeader>
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1">
-                      <CardTitle className="text-lg mb-2">{requirement.trainingTitle}</CardTitle>
-                      <div className="flex gap-2 mb-2">
-                        <Badge variant="secondary">
-                          <Clock className="w-3 h-3 mr-1" />
-                          {formatDuration(requirement.constraints.duration)}
-                        </Badge>
-                        <Badge variant="outline">
-                          <Users className="w-3 h-3 mr-1" />
-                          {requirement.deliveryPreferences.groupSize} people
-                        </Badge>
-                        <Badge variant="outline">
-                          {requirement.constraints.interactionLevel} interaction
-                        </Badge>
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        {requirement.targetAudience.industryContext}
-                      </p>
+      ) : requirements.length === 0 ? (
+        <Card>
+          <CardContent className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <h3 className="text-lg font-semibold mb-2">No Training Requirements Found</h3>
+              <p className="text-muted-foreground">
+                Create your first training requirement using the form to get started.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {requirements.map((requirement) => (
+            <Card key={requirement.id} className="hover:shadow-lg transition-shadow">
+              <CardHeader className="pb-3">
+                <div className="flex justify-between items-start">
+                  <div className="flex-1">
+                    <CardTitle className="text-lg line-clamp-2">{requirement.training_title}</CardTitle>
+                    <p className="text-sm text-muted-foreground mt-1">ID: {requirement.training_id}</p>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <Badge variant="secondary" className="mb-2">
+                      {requirement.target_audience.experienceLevel}
+                    </Badge>
+                    <Badge variant="outline">
+                      {requirement.delivery_preferences.format}
+                    </Badge>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div className="space-y-3">
+                  <p className="text-sm text-muted-foreground line-clamp-3">{requirement.description}</p>
+                  <div className="space-y-2">
+                    <div className="flex items-center text-sm text-muted-foreground mb-2">
+                      <Clock className="w-4 h-4 mr-2" />
+                      {formatDuration(requirement.constraints.duration)}
                     </div>
-                    <div className="flex gap-2">
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setSelectedRequirement(requirement)}
-                          >
-                            <Eye className="w-4 h-4 mr-1" />
-                            View Details
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-                          <DialogHeader>
-                            <DialogTitle>Training Requirement Details</DialogTitle>
-                          </DialogHeader>
-                          {selectedRequirement && (
-                            <div className="space-y-6">
+                    <div className="flex items-center text-sm text-muted-foreground">
+                      <Users className="w-4 h-4 mr-2" />
+                      {requirement.delivery_preferences.groupSize} participants
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center pt-2 border-t">
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" size="sm" onClick={() => setSelectedRequirement(requirement)}>
+                          <Eye className="w-4 h-4 mr-1" />
+                          View Details
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+                        <DialogHeader>
+                          <DialogTitle>{selectedRequirement?.training_title}</DialogTitle>
+                        </DialogHeader>
+                        {selectedRequirement && (
+                          <div className="space-y-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                               <div>
-                                <h3 className="font-semibold mb-2">Training Information</h3>
-                                <p className="text-sm mb-1"><strong>ID:</strong> {selectedRequirement.trainingID}</p>
-                                <p className="text-sm mb-1"><strong>Title:</strong> {selectedRequirement.trainingTitle}</p>
-                                <p className="text-sm mb-3"><strong>Description:</strong> {selectedRequirement.description}</p>
+                                <h3 className="font-semibold mb-2 flex items-center">
+                                  <FileText className="w-4 h-4 mr-2" />
+                                  Basic Information
+                                </h3>
+                                <div className="space-y-2 text-sm">
+                                  <p><strong>ID:</strong> {selectedRequirement.training_id}</p>
+                                  <p><strong>Description:</strong> {selectedRequirement.description}</p>
+                                  <p><strong>Industry:</strong> {selectedRequirement.target_audience.industryContext}</p>
+                                  <p><strong>Experience Level:</strong> {selectedRequirement.target_audience.experienceLevel}</p>
+                                </div>
                               </div>
-
                               <div>
-                                <h3 className="font-semibold mb-2">Learning Objectives</h3>
-                                <ul className="list-disc list-inside space-y-1">
-                                  {selectedRequirement.mindsetFocus.learningObjectives.map((objective, index) => (
-                                    <li key={index} className="text-sm">{objective}</li>
-                                  ))}
-                                </ul>
+                                <h3 className="font-semibold mb-2 flex items-center">
+                                  <Clock className="w-4 h-4 mr-2" />
+                                  Constraints & Delivery
+                                </h3>
+                                <div className="space-y-2 text-sm">
+                                  <p><strong>Duration:</strong> {formatDuration(selectedRequirement.constraints.duration)}</p>
+                                  <p><strong>Interaction Level:</strong> {selectedRequirement.constraints.interactionLevel}</p>
+                                  <p><strong>Format:</strong> {selectedRequirement.delivery_preferences.format}</p>
+                                  <p><strong>Group Size:</strong> {selectedRequirement.delivery_preferences.groupSize} participants</p>
+                                </div>
                               </div>
+                            </div>
 
-                              <div className="mb-3">
-                                <h4 className="font-medium mb-1">Primary Topics:</h4>
-                                <ul className="list-disc list-inside space-y-1">
-                                  {selectedRequirement.mindsetFocus.primaryTopics.map((topic, index) => (
-                                    <li key={index} className="text-sm">{topic}</li>
-                                  ))}
-                                </ul>
-                              </div>
-                              {selectedRequirement.mindsetFocus.secondaryTopics.length > 0 && (
-                                <div className="mb-3">
-                                  <h4 className="font-medium mb-1">Secondary Topics:</h4>
+                            <div>
+                              <h3 className="font-semibold mb-3 flex items-center">
+                                <Target className="w-4 h-4 mr-2" />
+                                Learning Objectives & Topics
+                              </h3>
+                              <div className="space-y-4">
+                                <div>
+                                  <h4 className="font-medium mb-2">Learning Objectives</h4>
                                   <ul className="list-disc list-inside space-y-1">
-                                    {selectedRequirement.mindsetFocus.secondaryTopics.map((topic, index) => (
-                                      <li key={index} className="text-sm">{topic}</li>
+                                    {selectedRequirement.mindset_focus.learningObjectives.map((objective: string, index: number) => (
+                                      <li key={index} className="text-sm">{objective}</li>
                                     ))}
                                   </ul>
                                 </div>
-                              )}
-
-                              <div className="mb-3">
-                                <p className="text-sm mb-1"><strong>Duration:</strong> {formatDuration(selectedRequirement.constraints.duration)}</p>
-                                <p className="text-sm"><strong>Interaction Level:</strong> {selectedRequirement.constraints.interactionLevel}</p>
-                              </div>
-
-                              <div className="mb-3">
-                                <p className="text-sm mb-1"><strong>Experience Level:</strong> {selectedRequirement.targetAudience.experienceLevel}</p>
-                                <p className="text-sm mb-1"><strong>Industry Context:</strong> {selectedRequirement.targetAudience.industryContext}</p>
-                              </div>
-
-                              <div className="mb-3">
-                                <p className="text-sm mb-1"><strong>Format:</strong> {selectedRequirement.deliveryPreferences.format}</p>
-                                <p className="text-sm"><strong>Group Size:</strong> {selectedRequirement.deliveryPreferences.groupSize}</p>
-                              </div>
-
-                              <div className="text-xs text-muted-foreground">
-                                <p><strong>Created:</strong> {new Date(selectedRequirement.createdAt).toLocaleString()}</p>
-                                <p><strong>Updated:</strong> {new Date(selectedRequirement.updatedAt).toLocaleString()}</p>
+                                <div>
+                                  <h4 className="font-medium mb-2">Primary Topics</h4>
+                                  <div className="flex flex-wrap gap-1">
+                                    {selectedRequirement.mindset_focus.primaryTopics.map((topic: string, index: number) => (
+                                      <Badge key={index} variant="default" className="text-xs">{topic}</Badge>
+                                    ))}
+                                  </div>
+                                </div>
+                                {selectedRequirement.mindset_focus.secondaryTopics.length > 0 && (
+                                  <div>
+                                    <h4 className="font-medium mb-2">Secondary Topics</h4>
+                                    <div className="flex flex-wrap gap-1">
+                                      {selectedRequirement.mindset_focus.secondaryTopics.map((topic: string, index: number) => (
+                                        <Badge key={index} variant="outline" className="text-xs">{topic}</Badge>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
                               </div>
                             </div>
-                          )}
-                        </DialogContent>
-                      </Dialog>
 
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            disabled={deleteLoading === requirement.id}
-                          >
-                            <Trash2 className="w-4 h-4 mr-1" />
-                            {deleteLoading === requirement.id ? 'Deleting...' : 'Delete'}
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Delete Training Requirement</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Are you sure you want to delete this training requirement? This action cannot be undone.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={() => handleDelete(requirement.id)}
-                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                            >
-                              Delete
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </div>
+                            <div className="text-xs text-muted-foreground pt-4 border-t">
+                              <p><strong>Created:</strong> {new Date(selectedRequirement.created_at).toLocaleString()}</p>
+                              <p><strong>Updated:</strong> {new Date(selectedRequirement.updated_at).toLocaleString()}</p>
+                            </div>
+                          </div>
+                        )}
+                      </DialogContent>
+                    </Dialog>
+
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          variant="destructive"
+                          size="icon"
+                          onClick={() => handleDelete(requirement.id)}
+                          disabled={deleteLoading === requirement.id}
+                        >
+                          {deleteLoading === requirement.id ? 'Deleting...' : <Trash2 className="w-4 h-4" />}
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Delete Training Requirement</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Are you sure you want to delete "{requirement.training_title}"? This action cannot be undone.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction onClick={() => handleDelete(requirement.id)}>
+                            Delete
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </div>
-                </CardHeader>
-              </Card>
-            ))}
-          </div>
-        )}
-      </div>
-    </>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
