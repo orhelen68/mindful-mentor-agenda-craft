@@ -22,11 +22,13 @@ export type Database = {
           delivery_notes: string | null
           description: string | null
           duration: number | null
+          facilitator: string | null
           group_size: Json | null
           id: string
           mindset_topics: string[] | null
           module_id: string
           module_title: string
+          participant: string | null
           sample_materials: Json | null
           tags: string[] | null
           updated_at: string
@@ -39,11 +41,13 @@ export type Database = {
           delivery_notes?: string | null
           description?: string | null
           duration?: number | null
+          facilitator?: string | null
           group_size?: Json | null
           id?: string
           mindset_topics?: string[] | null
           module_id: string
           module_title: string
+          participant?: string | null
           sample_materials?: Json | null
           tags?: string[] | null
           updated_at?: string
@@ -56,11 +60,13 @@ export type Database = {
           delivery_notes?: string | null
           description?: string | null
           duration?: number | null
+          facilitator?: string | null
           group_size?: Json | null
           id?: string
           mindset_topics?: string[] | null
           module_id?: string
           module_title?: string
+          participant?: string | null
           sample_materials?: Json | null
           tags?: string[] | null
           updated_at?: string
