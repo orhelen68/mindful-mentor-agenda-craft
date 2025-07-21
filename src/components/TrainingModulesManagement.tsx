@@ -519,14 +519,14 @@ export function TrainingModulesManagement() {
           </div>
           <div className="space-y-2">
             {tagFields.map((field, index) => (
-              <div key={field.id} className="flex gap-2">
+              <div key={`tag-${index}`} className="flex gap-2">
                 <FormField
                   control={form.control}
                   name={`tags.${index}.value`}
-                  render={({ field }) => (
+                  render={({ field: inputField }) => (
                     <FormItem className="flex-1">
                       <FormControl>
-                        <Input {...field} placeholder="Enter tag..." />
+                        <Input {...inputField} placeholder="Enter tag..." />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -561,14 +561,14 @@ export function TrainingModulesManagement() {
           </div>
           <div className="space-y-2">
             {mindsetFields.map((field, index) => (
-              <div key={field.id} className="flex gap-2">
+              <div key={`mindset-${index}`} className="flex gap-2">
                 <FormField
                   control={form.control}
                   name={`mindset_topics.${index}.value`}
-                  render={({ field }) => (
+                  render={({ field: inputField }) => (
                     <FormItem className="flex-1">
                       <FormControl>
-                        <Input {...field} placeholder="Enter mindset topic..." />
+                        <Input {...inputField} placeholder="Enter mindset topic..." />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
