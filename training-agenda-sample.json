@@ -1,5 +1,5 @@
 {
-  "trainingID": "agenda_001",
+  "trainingID": "req_001",
   "trainingTitle": "Leadership Mindset for New Managers",
   "overview": {
     "description": "A comprehensive 2-day program designed to develop confident leadership mindset and essential management skills",
@@ -19,7 +19,8 @@
       "duration": 30,
       "activityType": "formality",
       "activityDetails": {
-        "formalityType": "opening"
+        "formalityType": "opening",
+        "duration": 30
       },
       "notes": "Welcome, introductions, and agenda overview"
     },
@@ -29,7 +30,8 @@
       "duration": 90,
       "activityType": "module",
       "activityDetails": {
-        "moduleID": "mod_001"
+        "moduleID": "mod_001",
+        "duration": 90
       },
       "notes": "Leadership Confidence Building module"
     },
@@ -39,7 +41,8 @@
       "duration": 15,
       "activityType": "break",
       "activityDetails": {
-        "breakType": "tea"
+        "breakType": "tea",
+        "duration": 15
       },
       "notes": "Morning tea break"
     },
@@ -49,7 +52,8 @@
       "duration": 75,
       "activityType": "module",
       "activityDetails": {
-        "moduleID": "mod_002"
+        "moduleID": "mod_002",
+        "duration": 75
       },
       "notes": "Communication Styles module"
     },
@@ -59,39 +63,43 @@
       "duration": 60,
       "activityType": "break",
       "activityDetails": {
-        "breakType": "lunch"
+        "breakType": "lunch",
+        "duration": 60
       },
       "notes": "Lunch break"
     },
     {
       "sequenceNumber": 6,
       "startTime": "13:30",
-      "duration": 45,
+      "duration": 30,
       "activityType": "discussion",
       "activityDetails": {
         "discussionType": "breakout",
-        "discussionTopic": "Applying leadership concepts in your context"
+        "discussionTopic": "Applying leadership concepts in your context",
+        "duration": 30
       },
       "notes": "Small group discussions and sharing"
     },
     {
       "sequenceNumber": 7,
-      "startTime": "14:15",
+      "startTime": "14:00",
       "duration": 30,
       "activityType": "sharing",
       "activityDetails": {
         "speaker": "External Expert",
-        "topic": "Real-world leadership challenges and solutions"
+        "topic": "Real-world leadership challenges and solutions",
+        "duration": 30
       },
       "notes": "Guest speaker session"
     },
     {
       "sequenceNumber": 8,
-      "startTime": "14:45",
+      "startTime": "14:30",
       "duration": 15,
       "activityType": "formality",
       "activityDetails": {
-        "formalityType": "closing"
+        "formalityType": "closing",
+        "duration": 15
       },
       "notes": "Day 1 wrap-up and Day 2 preview"
     }

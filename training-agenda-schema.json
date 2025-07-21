@@ -1,0 +1,47 @@
+{
+  "trainingID": "string (should match training requirements ID)",
+  "trainingTitle": "string",
+  "overview": {
+    "description": "string",
+    "trainingObjectives": ["string"],
+    "totalDuration": "number (minutes)",
+    "groupSize": "number"
+  },
+  "timeslots": [
+    {
+      "sequenceNumber": "number",
+      "startTime": "string (HH:MM format)",
+      "duration": "number (minutes)",
+      "activityType": "module|formality|sharing|discussion|break",
+      "activityDetails": {
+        "module": {
+          "moduleID": "string (references module library)",
+          "duration": "number (should match module duration from library)"
+        },
+        "formality": {
+          "formalityType": "opening|closing",
+          "duration": "number (3|5|10|15|20|30 minutes)"
+        },
+        "sharing": {
+          "speaker": "string",
+          "topic": "string",
+          "duration": "number (20|30|45|60 minutes)"
+        },
+        "discussion": {
+          "discussionType": "plenary|breakout",
+          "discussionTopic": "string",
+          "duration": "number (20|30 minutes)"
+        },
+        "break": {
+          "breakType": "tea|lunch|stretch",
+          "duration": "number (5|10|15|20|30 minutes)"
+        }
+      },
+      "notes": "string"
+    }
+  ],
+  "preReading": ["string"],
+  "postWorkshopFollowUp": ["string"],
+  "createdAt": "ISO date",
+  "updatedAt": "ISO date"
+}
