@@ -25,9 +25,9 @@ const trainingRequirementsSchema = z.object({
     interactionLevel: z.enum(['low', 'medium', 'high']),
   }),
   mindsetFocus: z.object({
-    learningObjectives: z.array(z.string()).min(1, 'At least one objective is required'),
-    primaryTopics: z.array(z.string()).min(1, 'At least one primary topic is required'),
-    secondaryTopics: z.array(z.string()),
+    learningObjectives: z.array(z.object({ value: z.string() })).min(1, 'At least one objective is required'),
+    primaryTopics: z.array(z.object({ value: z.string() })).min(1, 'At least one primary topic is required'),
+    secondaryTopics: z.array(z.object({ value: z.string() })),
   }),
   deliveryPreferences: z.object({
     format: z.enum(['in-person', 'virtual', 'hybrid']),
@@ -56,9 +56,9 @@ export function TrainingRequirementsForm({ onSuccess }: { onSuccess?: () => void
         interactionLevel: 'medium' as const,
       },
       mindsetFocus: {
-        learningObjectives: [''],
-        primaryTopics: [''],
-        secondaryTopics: [''],
+        learningObjectives: [{ value: '' }],
+        primaryTopics: [{ value: '' }],
+        secondaryTopics: [{ value: '' }],
       },
       deliveryPreferences: {
         format: 'in-person' as const,
@@ -69,17 +69,17 @@ export function TrainingRequirementsForm({ onSuccess }: { onSuccess?: () => void
 
   const { fields: objectiveFields, append: appendObjective, remove: removeObjective } = useFieldArray({
     control: form.control,
-    name: 'mindsetFocus.learningObjectives',
+    name: 'mindsetFocus.learningObjectives' as const,
   });
 
   const { fields: primaryTopicFields, append: appendPrimaryTopic, remove: removePrimaryTopic } = useFieldArray({
     control: form.control,
-    name: 'mindsetFocus.primaryTopics',
+    name: 'mindsetFocus.primaryTopics' as const,
   });
 
   const { fields: secondaryTopicFields, append: appendSecondaryTopic, remove: removeSecondaryTopic } = useFieldArray({
     control: form.control,
-    name: 'mindsetFocus.secondaryTopics',
+    name: 'mindsetFocus.secondaryTopics' as const,
   });
 
   const onSubmit = async (data: TrainingRequirementsFormData) => {
@@ -90,9 +90,9 @@ export function TrainingRequirementsForm({ onSuccess }: { onSuccess?: () => void
         ...data,
         mindsetFocus: {
           ...data.mindsetFocus,
-          learningObjectives: data.mindsetFocus.learningObjectives.filter(obj => obj.trim() !== ''),
-          primaryTopics: data.mindsetFocus.primaryTopics.filter(topic => topic.trim() !== ''),
-          secondaryTopics: data.mindsetFocus.secondaryTopics.filter(topic => topic.trim() !== ''),
+          learningObjectives: data.mindsetFocus.learningObjectives.map(obj => obj.value).filter(val => val.trim() !== ''),
+          primaryTopics: data.mindsetFocus.primaryTopics.map(topic => topic.value).filter(val => val.trim() !== ''),
+          secondaryTopics: data.mindsetFocus.secondaryTopics.map(topic => topic.value).filter(val => val.trim() !== ''),
         }
       };
       
@@ -308,7 +308,7 @@ export function TrainingRequirementsForm({ onSuccess }: { onSuccess?: () => void
                       <div key={field.id} className="flex gap-3">
                         <FormField
                           control={form.control}
-                          name={`mindsetFocus.learningObjectives.${index}`}
+                          name={`mindsetFocus.learningObjectives.${index}.value` as const}
                           render={({ field }) => (
                             <FormItem className="flex-1">
                               <FormControl>
@@ -333,7 +333,7 @@ export function TrainingRequirementsForm({ onSuccess }: { onSuccess?: () => void
                     <Button
                       type="button"
                       variant="outline"
-                      onClick={() => appendObjective('')}
+                      onClick={() => appendObjective({ value: '' })}
                       className="w-full"
                     >
                       <Plus className="h-4 w-4 mr-2" />
@@ -349,7 +349,7 @@ export function TrainingRequirementsForm({ onSuccess }: { onSuccess?: () => void
                       <div key={field.id} className="flex gap-3">
                         <FormField
                           control={form.control}
-                          name={`mindsetFocus.primaryTopics.${index}`}
+                          name={`mindsetFocus.primaryTopics.${index}.value` as const}
                           render={({ field }) => (
                             <FormItem className="flex-1">
                               <FormControl>
@@ -374,7 +374,7 @@ export function TrainingRequirementsForm({ onSuccess }: { onSuccess?: () => void
                     <Button
                       type="button"
                       variant="outline"
-                      onClick={() => appendPrimaryTopic('')}
+                      onClick={() => appendPrimaryTopic({ value: '' })}
                       className="w-full"
                     >
                       <Plus className="h-4 w-4 mr-2" />
@@ -390,7 +390,7 @@ export function TrainingRequirementsForm({ onSuccess }: { onSuccess?: () => void
                       <div key={field.id} className="flex gap-3">
                         <FormField
                           control={form.control}
-                          name={`mindsetFocus.secondaryTopics.${index}`}
+                          name={`mindsetFocus.secondaryTopics.${index}.value` as const}
                           render={({ field }) => (
                             <FormItem className="flex-1">
                               <FormControl>
@@ -414,7 +414,7 @@ export function TrainingRequirementsForm({ onSuccess }: { onSuccess?: () => void
                     <Button
                       type="button"
                       variant="outline"
-                      onClick={() => appendSecondaryTopic('')}
+                      onClick={() => appendSecondaryTopic({ value: '' })}
                       className="w-full"
                     >
                       <Plus className="h-4 w-4 mr-2" />

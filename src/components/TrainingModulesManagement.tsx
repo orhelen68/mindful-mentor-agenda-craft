@@ -25,11 +25,11 @@ const activitySchema = z.object({
 const trainingModuleSchema = z.object({
   title: z.string().min(1, 'Title is required'),
   description: z.string().min(1, 'Description is required'),
-  objectives: z.array(z.string()).min(1, 'At least one objective is required'),
+  objectives: z.array(z.object({ value: z.string() })).min(1, 'At least one objective is required'),
   duration: z.number().min(1, 'Duration must be at least 1 minute'),
-  materials: z.array(z.string()),
+  materials: z.array(z.object({ value: z.string() })),
   activities: z.array(activitySchema),
-  tags: z.array(z.string()),
+  tags: z.array(z.object({ value: z.string() })),
 });
 
 type TrainingModuleFormData = z.infer<typeof trainingModuleSchema>;
@@ -49,32 +49,32 @@ export function TrainingModulesManagement() {
     defaultValues: {
       title: '',
       description: '',
-      objectives: [''],
+      objectives: [{ value: '' }],
       duration: 60,
-      materials: [''],
+      materials: [{ value: '' }],
       activities: [{ type: 'lecture' as const, description: '', duration: 30 }],
-      tags: [''],
+      tags: [{ value: '' }],
     },
   });
 
   const { fields: objectiveFields, append: appendObjective, remove: removeObjective } = useFieldArray({
     control: form.control,
-    name: 'objectives',
+    name: 'objectives' as const,
   });
 
   const { fields: materialFields, append: appendMaterial, remove: removeMaterial } = useFieldArray({
     control: form.control,
-    name: 'materials',
+    name: 'materials' as const,
   });
 
   const { fields: activityFields, append: appendActivity, remove: removeActivity } = useFieldArray({
     control: form.control,
-    name: 'activities',
+    name: 'activities' as const,
   });
 
   const { fields: tagFields, append: appendTag, remove: removeTag } = useFieldArray({
     control: form.control,
-    name: 'tags',
+    name: 'tags' as const,
   });
 
   const loadModules = async () => {
@@ -119,12 +119,12 @@ export function TrainingModulesManagement() {
 
   const handleAdd = async (data: TrainingModuleFormData) => {
     try {
-      // Filter out empty strings
+      // Filter out empty strings and convert to string arrays
       const cleanedData = {
         ...data,
-        objectives: data.objectives.filter(obj => obj.trim() !== ''),
-        materials: data.materials.filter(mat => mat.trim() !== ''),
-        tags: data.tags.filter(tag => tag.trim() !== ''),
+        objectives: data.objectives.map(obj => obj.value).filter(val => val.trim() !== ''),
+        materials: data.materials.map(mat => mat.value).filter(val => val.trim() !== ''),
+        tags: data.tags.map(tag => tag.value).filter(val => val.trim() !== ''),
       };
       
       await jsonBinService.addTrainingModule(cleanedData as Omit<TrainingModule, 'id' | 'createdAt' | 'updatedAt'>);
@@ -148,12 +148,12 @@ export function TrainingModulesManagement() {
     if (!editingModule) return;
     
     try {
-      // Filter out empty strings
+      // Filter out empty strings and convert to string arrays
       const cleanedData = {
         ...data,
-        objectives: data.objectives.filter(obj => obj.trim() !== ''),
-        materials: data.materials.filter(mat => mat.trim() !== ''),
-        tags: data.tags.filter(tag => tag.trim() !== ''),
+        objectives: data.objectives.map(obj => obj.value).filter(val => val.trim() !== ''),
+        materials: data.materials.map(mat => mat.value).filter(val => val.trim() !== ''),
+        tags: data.tags.map(tag => tag.value).filter(val => val.trim() !== ''),
       };
       
       await jsonBinService.updateTrainingModule(editingModule.id, cleanedData as Partial<TrainingModule>);
@@ -178,11 +178,11 @@ export function TrainingModulesManagement() {
     form.reset({
       title: module.title,
       description: module.description,
-      objectives: module.objectives,
+      objectives: module.objectives.map(obj => ({ value: obj })),
       duration: module.duration,
-      materials: module.materials,
+      materials: module.materials.map(mat => ({ value: mat })),
       activities: module.activities,
-      tags: module.tags,
+      tags: module.tags.map(tag => ({ value: tag })),
     });
   };
 
@@ -250,7 +250,7 @@ export function TrainingModulesManagement() {
             <div key={field.id} className="flex gap-2 mt-2">
               <FormField
                 control={form.control}
-                name={`objectives.${index}`}
+                name={`objectives.${index}.value` as const}
                 render={({ field }) => (
                   <FormItem className="flex-1">
                     <FormControl>
@@ -275,7 +275,7 @@ export function TrainingModulesManagement() {
             type="button"
             variant="outline"
             size="sm"
-            onClick={() => appendObjective('')}
+            onClick={() => appendObjective({ value: '' })}
             className="mt-2"
           >
             <Plus className="h-4 w-4 mr-2" />
@@ -289,7 +289,7 @@ export function TrainingModulesManagement() {
             <div key={field.id} className="flex gap-2 mt-2">
               <FormField
                 control={form.control}
-                name={`materials.${index}`}
+                name={`materials.${index}.value` as const}
                 render={({ field }) => (
                   <FormItem className="flex-1">
                     <FormControl>
@@ -313,7 +313,7 @@ export function TrainingModulesManagement() {
             type="button"
             variant="outline"
             size="sm"
-            onClick={() => appendMaterial('')}
+            onClick={() => appendMaterial({ value: '' })}
             className="mt-2"
           >
             <Plus className="h-4 w-4 mr-2" />
@@ -328,7 +328,7 @@ export function TrainingModulesManagement() {
               <div className="grid grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
-                  name={`activities.${index}.type`}
+                  name={`activities.${index}.type` as const}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Type</FormLabel>
@@ -352,7 +352,7 @@ export function TrainingModulesManagement() {
                 
                 <FormField
                   control={form.control}
-                  name={`activities.${index}.duration`}
+                  name={`activities.${index}.duration` as const}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Duration (minutes)</FormLabel>
@@ -370,7 +370,7 @@ export function TrainingModulesManagement() {
               
               <FormField
                 control={form.control}
-                name={`activities.${index}.description`}
+                name={`activities.${index}.description` as const}
                 render={({ field }) => (
                   <FormItem className="mt-4">
                     <FormLabel>Description</FormLabel>
@@ -411,7 +411,7 @@ export function TrainingModulesManagement() {
             <div key={field.id} className="flex gap-2 mt-2">
               <FormField
                 control={form.control}
-                name={`tags.${index}`}
+                name={`tags.${index}.value` as const}
                 render={({ field }) => (
                   <FormItem className="flex-1">
                     <FormControl>
@@ -435,7 +435,7 @@ export function TrainingModulesManagement() {
             type="button"
             variant="outline"
             size="sm"
-            onClick={() => appendTag('')}
+            onClick={() => appendTag({ value: '' })}
             className="mt-2"
           >
             <Plus className="h-4 w-4 mr-2" />
@@ -504,165 +504,180 @@ export function TrainingModulesManagement() {
         </DialogContent>
       </Dialog>
 
-      {modules.length === 0 ? (
-        <Card>
-          <CardContent className="flex items-center justify-center h-64">
-            <div className="text-center">
-              <h3 className="text-lg font-semibold mb-2">No Training Modules Found</h3>
-              <p className="text-muted-foreground">Create your first training module to get started.</p>
-            </div>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="grid gap-4">
-          {modules.map((module) => (
-            <Card key={module.id} className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <div className="flex justify-between items-start">
-                  <div>
-                    <CardTitle className="flex items-center gap-2">
-                      <BookOpen className="w-5 h-5" />
-                      {module.title}
-                    </CardTitle>
-                    <p className="text-muted-foreground mt-1">{module.description}</p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Badge variant="secondary" className="flex items-center gap-1">
-                      <Clock className="w-3 h-3" />
-                      {formatDuration(module.duration)}
-                    </Badge>
-                  </div>
+      {/* View Details Dialog */}
+      <Dialog open={!!selectedModule} onOpenChange={(open) => !open && setSelectedModule(null)}>
+        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{selectedModule?.title}</DialogTitle>
+          </DialogHeader>
+          {selectedModule && (
+            <div className="space-y-6">
+              <div>
+                <h4 className="font-semibold mb-2">Description</h4>
+                <p className="text-muted-foreground">{selectedModule.description}</p>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <h4 className="font-semibold mb-2">Duration</h4>
+                  <p className="text-muted-foreground">{formatDuration(selectedModule.duration)}</p>
                 </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div>
-                    <h4 className="font-medium mb-2">Learning Objectives:</h4>
-                    <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
-                      {module.objectives.map((objective, index) => (
-                        <li key={index}>{objective}</li>
-                      ))}
-                    </ul>
-                  </div>
-                  
-                  <div className="flex flex-wrap gap-1">
-                    {module.tags.map((tag, index) => (
-                      <Badge key={index} variant="outline" className="text-xs">
-                        {tag}
-                      </Badge>
+                <div>
+                  <h4 className="font-semibold mb-2">Activities Count</h4>
+                  <p className="text-muted-foreground">{selectedModule.activities?.length || 0}</p>
+                </div>
+              </div>
+
+              {selectedModule.objectives && selectedModule.objectives.length > 0 && (
+                <div>
+                  <h4 className="font-semibold mb-2">Objectives</h4>
+                  <ul className="list-disc list-inside space-y-1">
+                    {selectedModule.objectives.map((objective, index) => (
+                      <li key={index} className="text-muted-foreground">{objective}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {selectedModule.materials && selectedModule.materials.length > 0 && (
+                <div>
+                  <h4 className="font-semibold mb-2">Materials</h4>
+                  <ul className="list-disc list-inside space-y-1">
+                    {selectedModule.materials.map((material, index) => (
+                      <li key={index} className="text-muted-foreground">{material}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {selectedModule.activities && selectedModule.activities.length > 0 && (
+                <div>
+                  <h4 className="font-semibold mb-2">Activities</h4>
+                  <div className="space-y-3">
+                    {selectedModule.activities.map((activity, index) => (
+                      <div key={index} className="border p-3 rounded">
+                        <div className="flex justify-between items-center mb-2">
+                          <Badge variant="outline">{activity.type}</Badge>
+                          <span className="text-sm text-muted-foreground">
+                            <Clock className="w-4 h-4 inline mr-1" />
+                            {formatDuration(activity.duration)}
+                          </span>
+                        </div>
+                        <p className="text-sm text-muted-foreground">{activity.description}</p>
+                      </div>
                     ))}
                   </div>
-                  
-                  <div className="flex justify-end gap-2 pt-4">
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button variant="outline" size="sm">
-                          <Eye className="w-4 h-4 mr-2" />
-                          View Details
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-                        <DialogHeader>
-                          <DialogTitle>{module.title}</DialogTitle>
-                        </DialogHeader>
-                        <div className="space-y-6">
-                          <div>
-                            <h3 className="font-semibold mb-2">Description</h3>
-                            <p className="text-muted-foreground">{module.description}</p>
-                          </div>
-                          
-                          <div>
-                            <h3 className="font-semibold mb-2">Learning Objectives</h3>
-                            <ul className="list-disc list-inside space-y-1">
-                              {module.objectives.map((objective, index) => (
-                                <li key={index}>{objective}</li>
-                              ))}
-                            </ul>
-                          </div>
-                          
-                          <div>
-                            <h3 className="font-semibold mb-2">Materials</h3>
-                            <ul className="list-disc list-inside space-y-1">
-                              {module.materials.map((material, index) => (
-                                <li key={index}>{material}</li>
-                              ))}
-                            </ul>
-                          </div>
-                          
-                          <div>
-                            <h3 className="font-semibold mb-2">Activities</h3>
-                            <div className="space-y-3">
-                              {module.activities.map((activity, index) => (
-                                <div key={index} className="border p-3 rounded">
-                                  <div className="flex justify-between items-center mb-2">
-                                    <Badge variant="secondary">{activity.type.replace('_', ' ')}</Badge>
-                                    <span className="text-sm text-muted-foreground">{activity.duration} min</span>
-                                  </div>
-                                  <p className="text-sm">{activity.description}</p>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                          
-                          <div>
-                            <h3 className="font-semibold mb-2">Tags</h3>
-                            <div className="flex flex-wrap gap-2">
-                              {module.tags.map((tag, index) => (
-                                <Badge key={index} variant="outline">{tag}</Badge>
-                              ))}
-                            </div>
-                          </div>
-                          
-                          <div className="text-xs text-muted-foreground">
-                            Created: {new Date(module.createdAt).toLocaleDateString()}
-                            {module.updatedAt !== module.createdAt && (
-                              <> • Updated: {new Date(module.updatedAt).toLocaleDateString()}</>
-                            )}
-                          </div>
-                        </div>
-                      </DialogContent>
-                    </Dialog>
-                    
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => startEdit(module)}
-                    >
-                      <Edit className="w-4 h-4 mr-2" />
-                      Edit
-                    </Button>
-                    
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button variant="destructive" size="sm" disabled={deleteLoading === module.id}>
-                          <Trash2 className="w-4 h-4 mr-2" />
-                          Delete
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            This action cannot be undone. This will permanently delete the training module
-                            "{module.title}" and remove it from the database.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={() => handleDelete(module.id)}
-                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                          >
-                            Delete
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
+                </div>
+              )}
+
+              {selectedModule.tags && selectedModule.tags.length > 0 && (
+                <div>
+                  <h4 className="font-semibold mb-2">Tags</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedModule.tags.map((tag, index) => (
+                      <Badge key={index} variant="secondary">{tag}</Badge>
+                    ))}
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          ))}
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Modules Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {modules.map((module) => (
+          <Card key={module.id} className="hover:shadow-lg transition-shadow">
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <BookOpen className="w-5 h-5" />
+                {module.title}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground mb-4 line-clamp-3">{module.description}</p>
+              
+              <div className="flex items-center gap-4 mb-4 text-sm text-muted-foreground">
+                <span className="flex items-center gap-1">
+                  <Clock className="w-4 h-4" />
+                  {formatDuration(module.duration)}
+                </span>
+                {module.activities && (
+                  <span>{module.activities.length} activities</span>
+                )}
+              </div>
+
+              {module.tags && module.tags.length > 0 && (
+                <div className="flex flex-wrap gap-1 mb-4">
+                  {module.tags.slice(0, 3).map((tag, index) => (
+                    <Badge key={index} variant="secondary" className="text-xs">{tag}</Badge>
+                  ))}
+                  {module.tags.length > 3 && (
+                    <Badge variant="outline" className="text-xs">+{module.tags.length - 3}</Badge>
+                  )}
+                </div>
+              )}
+
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setSelectedModule(module)}
+                  className="flex-1"
+                >
+                  <Eye className="w-4 h-4 mr-1" />
+                  View
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => startEdit(module)}
+                  className="flex-1"
+                >
+                  <Edit className="w-4 h-4 mr-1" />
+                  Edit
+                </Button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="destructive" size="sm">
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Delete Training Module</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Are you sure you want to delete "{module.title}"? This action cannot be undone.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={() => handleDelete(module.id)}
+                        disabled={deleteLoading === module.id}
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      >
+                        {deleteLoading === module.id ? 'Deleting...' : 'Delete'}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {modules.length === 0 && !loading && (
+        <div className="text-center py-12">
+          <BookOpen className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+          <h3 className="text-lg font-semibold mb-2">No training modules found</h3>
+          <p className="text-muted-foreground mb-4">Get started by adding your first training module.</p>
+          <Button onClick={() => setShowAddDialog(true)}>
+            <Plus className="w-4 h-4 mr-2" />
+            Add First Module
+          </Button>
         </div>
       )}
     </div>
