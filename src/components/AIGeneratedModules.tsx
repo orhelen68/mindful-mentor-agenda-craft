@@ -40,7 +40,7 @@ interface AIResponse {
   updatedAt: string;
 }
 
-export function AIGeneratedModules() {
+export function AIGeneratedModules({ onBack }: { onBack?: () => void }) {
   const [step, setStep] = useState(1);
   const [trainingTopic, setTrainingTopic] = useState('');
   const [apiKey, setApiKey] = useState('');

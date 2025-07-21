@@ -25,8 +25,8 @@ const trainingRequirementsSchema = z.object({
     interactionLevel: z.enum(['low', 'medium', 'high']),
   }),
   mindsetFocus: z.object({
-    learningObjectives: z.array(z.string().min(1, 'Objective cannot be empty')).min(1, 'At least one objective is required'),
-    primaryTopics: z.array(z.string().min(1, 'Primary topic cannot be empty')).min(1, 'At least one primary topic is required'),
+    learningObjectives: z.array(z.string()).min(1, 'At least one objective is required'),
+    primaryTopics: z.array(z.string()).min(1, 'At least one primary topic is required'),
     secondaryTopics: z.array(z.string()),
   }),
   deliveryPreferences: z.object({
@@ -48,12 +48,12 @@ export function TrainingRequirementsForm({ onSuccess }: { onSuccess?: () => void
       trainingTitle: '',
       description: '',
       targetAudience: {
-        experienceLevel: 'intermediate',
+        experienceLevel: 'intermediate' as const,
         industryContext: '',
       },
       constraints: {
         duration: 480,
-        interactionLevel: 'medium',
+        interactionLevel: 'medium' as const,
       },
       mindsetFocus: {
         learningObjectives: [''],
@@ -61,7 +61,7 @@ export function TrainingRequirementsForm({ onSuccess }: { onSuccess?: () => void
         secondaryTopics: [''],
       },
       deliveryPreferences: {
-        format: 'in-person',
+        format: 'in-person' as const,
         groupSize: 10,
       },
     },
@@ -85,7 +85,18 @@ export function TrainingRequirementsForm({ onSuccess }: { onSuccess?: () => void
   const onSubmit = async (data: TrainingRequirementsFormData) => {
     setIsSubmitting(true);
     try {
-      await jsonBinService.addTrainingRequirement(data as any);
+      // Filter out empty strings
+      const cleanedData = {
+        ...data,
+        mindsetFocus: {
+          ...data.mindsetFocus,
+          learningObjectives: data.mindsetFocus.learningObjectives.filter(obj => obj.trim() !== ''),
+          primaryTopics: data.mindsetFocus.primaryTopics.filter(topic => topic.trim() !== ''),
+          secondaryTopics: data.mindsetFocus.secondaryTopics.filter(topic => topic.trim() !== ''),
+        }
+      };
+      
+      await jsonBinService.addTrainingRequirement(cleanedData as any);
       toast({
         title: 'Success',
         description: 'Training requirements saved successfully!',
@@ -93,9 +104,10 @@ export function TrainingRequirementsForm({ onSuccess }: { onSuccess?: () => void
       form.reset();
       onSuccess?.();
     } catch (error) {
+      console.error('Error saving requirements:', error);
       toast({
         title: 'Error',
-        description: 'Failed to save training requirements. Please try again.',
+        description: 'Failed to save training requirements. Please check your internet connection.',
         variant: 'destructive',
       });
     } finally {
