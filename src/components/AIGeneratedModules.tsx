@@ -15,6 +15,8 @@ interface AIResponse {
   moduleID: string;
   moduleTitle: string;
   description: string;
+  facilitator: string;
+  participant: string;
   category: string;
   tags: string[];
   duration: number;
@@ -74,7 +76,9 @@ Return results in this structured format:
 {
   "moduleID": "string",
   "moduleTitle": "string", 
-  "description": "Detailed step-by-step facilitation guide including: opening (5 min), main activities with specific instructions and timing, group exercises with exact setup, discussion questions to ask, and closing summary. Include specific examples, scenarios, or case studies to use.",
+  "description": "string",
+  "facilitator": "string",
+  "participant": "string",
   "category": "string",
   "tags": ["string"],
   "duration": "number (minutes)",
@@ -89,7 +93,7 @@ Return results in this structured format:
     "optimal breakout size": "number"
   },
   "mindsetTopics": ["string"],
-  "deliveryNotes": "Specific facilitation tips, potential challenges, and how to adapt for virtual vs in-person delivery",
+  "deliveryNotes": "string",
   "sampleMaterials": [
     {
       "materialType": "presentation|facilitator_guide|handout|worksheet|etc",
