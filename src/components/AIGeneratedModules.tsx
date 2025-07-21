@@ -71,42 +71,51 @@ For each module, provide REAL examples with:
 - Specific activity setup, timing, group configurations, and materials needed
 - Real-world examples and scenarios to use during the single activity
 
-Return results in this structured format:
+CRITICAL: You MUST return results in this EXACT structured format as a valid JSON array. DO NOT deviate from this schema:
 
-{
-  "moduleID": "string",
-  "moduleTitle": "string", 
-  "description": "string",
-  "facilitator": "string",
-  "participant": "string",
-  "category": "string",
-  "tags": ["string"],
-  "duration": "number (minutes)",
-  "deliveryMethod": {
-    "format": "presentation|exercise|discussion|game|reflection",
-    "breakout": "yes|no"
-  },
-  "groupSize": {
-    "min": "number",
-    "max": "number", 
-    "optimal": "number",
-    "optimal breakout size": "number"
-  },
-  "mindsetTopics": ["string"],
-  "deliveryNotes": "string",
-  "sampleMaterials": [
-    {
-      "materialType": "presentation|facilitator_guide|handout|worksheet|etc",
-      "filename": "string",
-      "fileFormat": "pptx|pdf|docx",
-      "fileUrl": "string (real downloadable link)"
-    }
-  ],
-  "createdAt": "ISO date",
-  "updatedAt": "ISO date"
-}
+[
+  {
+    "moduleID": "string",
+    "moduleTitle": "string", 
+    "description": "string",
+    "facilitator": "string",
+    "participant": "string",
+    "category": "string",
+    "tags": ["string"],
+    "duration": number,
+    "deliveryMethod": {
+      "format": "presentation|exercise|discussion|game|reflection",
+      "breakout": "yes|no"
+    },
+    "groupSize": {
+      "min": number,
+      "max": number, 
+      "optimal": number,
+      "optimal breakout size": number
+    },
+    "mindsetTopics": ["string"],
+    "deliveryNotes": "string",
+    "sampleMaterials": [
+      {
+        "materialType": "presentation|facilitator_guide|handout|worksheet|etc",
+        "filename": "string",
+        "fileFormat": "pptx|pdf|docx",
+        "fileUrl": "string (real downloadable link)"
+      }
+    ],
+    "createdAt": "ISO date",
+    "updatedAt": "ISO date"
+  }
+]
 
-Focus on modules that are practical, tested in real training environments, and include downloadable materials from reputable training organizations, universities, or corporate learning platforms. Return the response as a valid JSON array.`;
+MANDATORY REQUIREMENTS:
+- Return ONLY valid JSON array format
+- Include ALL fields from the schema above
+- Use exact field names as specified
+- Ensure proper data types (strings, numbers, arrays, objects)
+- No additional text before or after the JSON
+
+Focus on modules that are practical, tested in real training environments, and include downloadable materials from reputable training organizations, universities, or corporate learning platforms.`;
     setSystemPrompt(prompt);
   };
 
@@ -114,6 +123,12 @@ Focus on modules that are practical, tested in real training environments, and i
     const prompt = `Please find real, existing training modules for the topic: "${trainingTopic}". 
 
 CRITICAL: Each module must contain only ONE single training activity (not multiple activities).
+
+MANDATORY DATA SCHEMA COMPLIANCE:
+- You MUST return data in the EXACT JSON schema provided in the system prompt
+- Include ALL required fields with correct data types
+- Use proper JSON formatting with no additional text
+- Return as a valid JSON array only
 
 Requirements:
 - Each module = ONE activity only (game, reflection, discussion, presentation, or exercise)
@@ -125,7 +140,7 @@ Requirements:
 - Include specific examples, scenarios, or case studies for the single activity
 - Ensure facilitation instructions in "facilitator" field are detailed enough for a facilitator to run the one activity immediately
 
-Return 3-5 high-quality modules, each containing ONE focused activity with complete facilitation details in the "facilitator" field and real resource links.`;
+RESPONSE FORMAT: Return 3-5 high-quality modules as a valid JSON array following the exact schema provided. No additional text or explanations outside the JSON.`;
     setUserPrompt(prompt);
   };
 
