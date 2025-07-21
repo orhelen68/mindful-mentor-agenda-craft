@@ -7,7 +7,7 @@
     "industryContext": "Technology and startup companies"
   },
   "constraints": {
-    "duration": "2 days",
+    "duration": 960,
     "interactionLevel": "high"
   },
   "mindsetFocus": {
