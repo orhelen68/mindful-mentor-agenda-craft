@@ -122,7 +122,7 @@ export function TrainingModulesManagement() {
 
     // Filter by category
     if (categoryFilter && categoryFilter !== 'all') {
-      filtered = filtered.filter(module => 
+      filtered = filtered.filter(module =>
         module.category.toLowerCase().includes(categoryFilter.toLowerCase())
       );
     }
@@ -132,7 +132,7 @@ export function TrainingModulesManagement() {
       const searchTerms = searchTags.toLowerCase().split(' ');
       filtered = filtered.filter(module => {
         const moduleTags = module.tags?.map(tag => tag.toLowerCase()) || [];
-        return searchTerms.some(term => 
+        return searchTerms.some(term =>
           moduleTags.some(tag => tag.includes(term)) ||
           module.module_title.toLowerCase().includes(term) ||
           module.description.toLowerCase().includes(term)
@@ -189,7 +189,7 @@ export function TrainingModulesManagement() {
         },
         mindset_topics: data.mindset_topics.map(topic => topic.value).filter(val => val.trim() !== ''),
         delivery_notes: data.delivery_notes,
-        sample_materials: data.sample_materials?.filter(material => 
+        sample_materials: data.sample_materials?.filter(material =>
           material.materialType && material.filename && material.fileFormat && material.fileUrl
         ).map(material => ({
           materialType: material.materialType,
@@ -240,7 +240,7 @@ export function TrainingModulesManagement() {
         },
         mindset_topics: data.mindset_topics.map(topic => topic.value).filter(val => val.trim() !== ''),
         delivery_notes: data.delivery_notes,
-        sample_materials: data.sample_materials?.filter(material => 
+        sample_materials: data.sample_materials?.filter(material =>
           material.materialType && material.filename && material.fileFormat && material.fileUrl
         ).map(material => ({
           materialType: material.materialType,
@@ -348,543 +348,335 @@ export function TrainingModulesManagement() {
           )}
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="facilitator"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Facilitator Notes</FormLabel>
-                <FormControl>
-                  <Textarea {...field} placeholder="Notes for facilitator..." />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="participant"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Participant Information</FormLabel>
-                <FormControl>
-                  <Textarea {...field} placeholder="Information for participants..." />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="duration"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Duration (minutes)</FormLabel>
-                <FormControl>
-                  <Input 
-                    type="number" 
-                    {...field} 
-                    onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="delivery_method.format"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Delivery Format</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select format" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="exercise">Exercise</SelectItem>
-                    <SelectItem value="lecture">Lecture</SelectItem>
-                    <SelectItem value="discussion">Discussion</SelectItem>
-                    <SelectItem value="game">Game</SelectItem>
-                    <SelectItem value="workshop">Workshop</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        <FormField
-          control={form.control}
-          name="delivery_method.breakout"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Includes Breakout Sessions?</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select breakout option" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="yes">Yes</SelectItem>
-                  <SelectItem value="no">No</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <div className="grid grid-cols-3 gap-4">
-          <FormField
-            control={form.control}
-            name="group_size.min"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Min Group Size</FormLabel>
-                <FormControl>
-                  <Input 
-                    type="number" 
-                    {...field} 
-                    onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="group_size.optimal"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Optimal Group Size</FormLabel>
-                <FormControl>
-                  <Input 
-                    type="number" 
-                    {...field} 
-                    onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="group_size.max"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Max Group Size</FormLabel>
-                <FormControl>
-                  <Input 
-                    type="number" 
-                    {...field} 
-                    onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        <div>
-          <FormLabel>Tags</FormLabel>
-          {tagFields.map((field, index) => (
-            <div key={field.id} className="flex gap-2 mt-2">
-              <FormField
-                control={form.control}
-                name={`tags.${index}.value` as const}
-                render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormControl>
-                      <Input {...field} placeholder="Enter tag..." />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button
-                type="button"
-                variant="outline"
-                size="icon"
-                onClick={() => removeTag(index)}
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            </div>
-          ))}
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => appendTag({ value: '' })}
-            className="mt-2"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Tag
+        <div className="flex justify-end gap-2">
+          <Button type="button" variant="outline" onClick={() => {
+            setShowAddDialog(false);
+            setEditingModule(null);
+            form.reset();
+          }}>
+            Cancel
+          </Button>
+          <Button type="submit">
+            {isEditing ? 'Update Module' : 'Add Module'}
           </Button>
         </div>
-
-        <div>
-          <FormLabel>Mindset Topics</FormLabel>
-          {mindsetFields.map((field, index) => (
-            <div key={field.id} className="flex gap-2 mt-2">
-              <FormField
-                control={form.control}
-                name={`mindset_topics.${index}.value` as const}
-                render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormControl>
-                      <Input {...field} placeholder="Enter mindset topic..." />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button
-                type="button"
-                variant="outline"
-                size="icon"
-                onClick={() => removeMindset(index)}
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            </div>
-          ))}
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => appendMindset({ value: '' })}
-            className="mt-2"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Mindset Topic
-          </Button>
-        </div>
-
-        <FormField
-          control={form.control}
-          name="delivery_notes"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Delivery Notes</FormLabel>
-              <FormControl>
-                <Textarea {...field} placeholder="Instructions for delivery..." />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <Button type="submit" className="w-full">
-          {isEditing ? 'Update Module' : 'Add Module'}
-        </Button>
       </form>
     </Form>
   );
 
-  if (showAIGenerator) {
-    return <AIGeneratedModules onBack={() => setShowAIGenerator(false)} />;
-  }
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-lg">Loading training modules...</div>
-      </div>
-    );
-  }
-
   return (
-    <>
-      <div className="space-y-6">
+    <div className="space-y-6">
+      <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20 rounded-2xl p-6 border border-purple-100 dark:border-purple-800">
         <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-bold">Training Modules Management</h2>
-          <div className="flex gap-2">
-            <Button
-              onClick={() => setShowAIGenerator(!showAIGenerator)}
-              variant={showAIGenerator ? "default" : "outline"}
+          <div>
+            <h2 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              Training Module Library
+            </h2>
+            <p className="text-muted-foreground mt-1">Manage your training modules and resources</p>
+          </div>
+          <div className="flex gap-3">
+            <Button 
+              onClick={() => setShowAddDialog(true)} 
+              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Add Module
+            </Button>
+            <Button 
+              onClick={() => setShowAIGenerator(true)} 
+              variant="outline" 
+              className="bg-white/50 border-purple-200 hover:bg-purple-50"
             >
               <Brain className="w-4 h-4 mr-2" />
-              AI Generated Modules
+              AI Generate
             </Button>
-            <Button onClick={loadModules} variant="outline">
+            <Button 
+              onClick={loadModules} 
+              variant="outline" 
+              className="bg-white/50 border-purple-200 hover:bg-purple-50"
+            >
               Refresh
             </Button>
-            <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-              <DialogTrigger asChild>
-                <Button>
-                  <Plus className="w-4 w-4 mr-2" />
-                  Add Module
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle>Add Training Module</DialogTitle>
-                </DialogHeader>
-                <ModuleForm onSubmit={handleAdd} />
-              </DialogContent>
-            </Dialog>
           </div>
         </div>
+      </div>
 
-        {/* Filters */}
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex-1">
-                <label className="text-sm font-medium mb-2 block">Filter by Category</label>
-                <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="All categories" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Categories</SelectItem>
-                    {Array.from(new Set(modules.map(m => m.category))).map(category => (
-                      <SelectItem key={category} value={category}>{category}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="flex-1">
-                <label className="text-sm font-medium mb-2 block">Search by Tags or Keywords</label>
-                <Input
-                  value={searchTags}
-                  onChange={(e) => setSearchTags(e.target.value)}
-                  placeholder="Enter tags or keywords to search..."
-                />
-              </div>
-              <div className="flex items-end">
-                <Button 
-                  variant="outline" 
-                  onClick={() => {
-                    setCategoryFilter('all');
-                    setSearchTags('');
-                  }}
-                >
-                  Clear Filters
-                </Button>
-              </div>
-            </div>
-            <div className="mt-4 text-sm text-muted-foreground">
-              Showing {filteredModules.length} of {modules.length} modules
-            </div>
+      <div className="grid md:grid-cols-4 gap-4">
+        <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border-blue-100 dark:border-blue-800">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-blue-700 dark:text-blue-300 text-sm">Filter by Category</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+              <SelectTrigger className="bg-white/50 dark:bg-gray-800/50">
+                <SelectValue placeholder="All Categories" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Categories</SelectItem>
+                <SelectItem value="leadership">Leadership</SelectItem>
+                <SelectItem value="communication">Communication</SelectItem>
+                <SelectItem value="teamwork">Teamwork</SelectItem>
+                <SelectItem value="problem-solving">Problem Solving</SelectItem>
+                <SelectItem value="creativity">Creativity</SelectItem>
+              </SelectContent>
+            </Select>
           </CardContent>
         </Card>
 
-        {/* Edit Dialog */}
-        <Dialog open={!!editingModule} onOpenChange={(open) => !open && setEditingModule(null)}>
-          <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Edit Training Module</DialogTitle>
-            </DialogHeader>
-            <ModuleForm onSubmit={handleEdit} isEditing />
-          </DialogContent>
-        </Dialog>
+        <Card className="md:col-span-3 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 border-green-100 dark:border-green-800">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-green-700 dark:text-green-300 text-sm">Search by Tags or Content</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Input
+              placeholder="Search by tags, title, or description..."
+              value={searchTags}
+              onChange={(e) => setSearchTags(e.target.value)}
+              className="bg-white/50 dark:bg-gray-800/50"
+            />
+          </CardContent>
+        </Card>
+      </div>
 
-        {/* View Details Dialog */}
-        <Dialog open={!!selectedModule} onOpenChange={(open) => !open && setSelectedModule(null)}>
-          <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>{selectedModule?.module_title}</DialogTitle>
-            </DialogHeader>
-            {selectedModule && (
-              <div className="space-y-6">
-                <div>
-                  <h4 className="font-semibold mb-2">Description</h4>
-                  <p className="text-muted-foreground">{selectedModule.description}</p>
-                </div>
-
-                {selectedModule.facilitator && (
-                  <div>
-                    <h4 className="font-semibold mb-2">Facilitator Notes</h4>
-                    <p className="text-muted-foreground">{selectedModule.facilitator}</p>
-                  </div>
-                )}
-
-                {selectedModule.participant && (
-                  <div>
-                    <h4 className="font-semibold mb-2">Participant Information</h4>
-                    <p className="text-muted-foreground">{selectedModule.participant}</p>
-                  </div>
-                )}
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <h4 className="font-semibold mb-2">Duration</h4>
-                    <p className="text-muted-foreground">{formatDuration(selectedModule.duration)}</p>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold mb-2">Category</h4>
-                    <p className="text-muted-foreground">{selectedModule.category}</p>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <h4 className="font-semibold mb-2">Delivery Method</h4>
-                    <p className="text-muted-foreground">
-                      {selectedModule.delivery_method.format} 
-                      {selectedModule.delivery_method.breakout === 'yes' && ' (with breakouts)'}
-                    </p>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold mb-2">Group Size</h4>
-                    <p className="text-muted-foreground">
-                      {selectedModule.group_size.min}-{selectedModule.group_size.max} 
-                      (optimal: {selectedModule.group_size.optimal})
-                    </p>
-                  </div>
-                </div>
-
-                {selectedModule.mindset_topics && selectedModule.mindset_topics.length > 0 && (
-                  <div>
-                    <h4 className="font-semibold mb-2">Mindset Topics</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedModule.mindset_topics.map((topic, index) => (
-                        <Badge key={index} variant="outline">{topic}</Badge>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {selectedModule.delivery_notes && (
-                  <div>
-                    <h4 className="font-semibold mb-2">Delivery Notes</h4>
-                    <p className="text-muted-foreground">{selectedModule.delivery_notes}</p>
-                  </div>
-                )}
-
-                {selectedModule.tags && selectedModule.tags.length > 0 && (
-                  <div>
-                    <h4 className="font-semibold mb-2">Tags</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedModule.tags.map((tag, index) => (
-                        <Badge key={index} variant="secondary">{tag}</Badge>
-                      ))}
-                    </div>
-                  </div>
-                )}
+      {loading ? (
+        <div className="flex items-center justify-center h-64">
+          <div className="text-lg">Loading modules...</div>
+        </div>
+      ) : filteredModules.length === 0 ? (
+        <Card className="bg-gradient-to-br from-slate-50 to-gray-50 dark:from-slate-900/50 dark:to-gray-900/50 border-dashed border-2 border-gray-300 dark:border-gray-700">
+          <CardContent className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 rounded-full flex items-center justify-center">
+                <BookOpen className="w-8 h-8 text-purple-600 dark:text-purple-400" />
               </div>
-            )}
-          </DialogContent>
-        </Dialog>
-
-        {/* Modules Grid */}
+              <h3 className="text-lg font-semibold mb-2">No Training Modules Found</h3>
+              <p className="text-muted-foreground mb-4">Create your first training module to get started.</p>
+              <Button onClick={() => setShowAddDialog(true)} className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">
+                <Plus className="w-4 h-4 mr-2" />
+                Add Training Module
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredModules.map((module) => (
-            <Card key={module.id} className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <BookOpen className="w-5 h-5" />
-                  {module.module_title}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground mb-4 line-clamp-3">{module.description}</p>
-                
-                <div className="flex items-center gap-4 mb-4 text-sm text-muted-foreground">
-                  <span className="flex items-center gap-1">
-                    <Clock className="w-4 h-4" />
-                    {formatDuration(module.duration)}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <Users className="w-4 h-4" />
-                    {module.group_size.optimal}
-                  </span>
+            <Card key={module.id} className="hover:shadow-xl transition-all duration-300 hover:scale-105 bg-gradient-to-br from-white to-gray-50/50 dark:from-gray-900 dark:to-gray-800/50 border-gray-200 dark:border-gray-700">
+              <CardHeader className="pb-3 bg-gradient-to-r from-purple-50/50 to-pink-50/50 dark:from-purple-950/20 dark:to-pink-950/20 rounded-t-lg">
+                <div className="flex justify-between items-start">
+                  <div className="flex-1">
+                    <CardTitle className="text-lg line-clamp-2 bg-gradient-to-r from-purple-700 to-pink-700 bg-clip-text text-transparent">
+                      {module.module_title}
+                    </CardTitle>
+                    <Badge className="mt-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white border-0">
+                      {module.category}
+                    </Badge>
+                  </div>
                 </div>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div className="space-y-4">
+                  <p className="text-sm text-muted-foreground line-clamp-3">{module.description}</p>
+                  
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="flex items-center text-sm bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-950/20 dark:to-amber-950/20 p-2 rounded-lg border border-orange-100 dark:border-orange-800">
+                      <Clock className="w-4 h-4 mr-2 text-orange-600 dark:text-orange-400" />
+                      <span className="text-orange-700 dark:text-orange-300">{formatDuration(module.duration)}</span>
+                    </div>
+                    <div className="flex items-center text-sm bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20 p-2 rounded-lg border border-blue-100 dark:border-blue-800">
+                      <Users className="w-4 h-4 mr-2 text-blue-600 dark:text-blue-400" />
+                      <span className="text-blue-700 dark:text-cyan-300">{module.group_size.optimal}</span>
+                    </div>
+                  </div>
 
-                <div className="mb-4">
-                  <Badge variant="outline" className="text-xs mb-2">{module.category}</Badge>
                   {module.tags && module.tags.length > 0 && (
                     <div className="flex flex-wrap gap-1">
                       {module.tags.slice(0, 3).map((tag, index) => (
-                        <Badge key={index} variant="secondary" className="text-xs">{tag}</Badge>
+                        <Badge key={index} variant="outline" className="text-xs border-purple-200 text-purple-700 dark:border-purple-700 dark:text-purple-300">
+                          {tag}
+                        </Badge>
                       ))}
                       {module.tags.length > 3 && (
                         <Badge variant="outline" className="text-xs">+{module.tags.length - 3}</Badge>
                       )}
                     </div>
                   )}
-                </div>
 
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setSelectedModule(module)}
-                    className="flex-1"
-                  >
-                    <Eye className="w-4 h-4 mr-1" />
-                    View
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => startEdit(module)}
-                    className="flex-1"
-                  >
-                    <Edit className="w-4 h-4 mr-1" />
-                    Edit
-                  </Button>
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button variant="destructive" size="sm">
-                        <Trash2 className="w-4 h-4" />
+                  <div className="flex justify-between items-center pt-4 border-t border-gray-100 dark:border-gray-700">
+                    <div className="flex gap-2">
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button variant="outline" size="sm" onClick={() => setSelectedModule(module)} className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 border-blue-200 dark:border-blue-700 hover:from-blue-100 hover:to-indigo-100 dark:hover:from-blue-900/50 dark:hover:to-indigo-900/50">
+                            <Eye className="w-4 h-4 mr-1" />
+                            View
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto bg-gradient-to-br from-white to-gray-50/50 dark:from-gray-900 dark:to-gray-800/50">
+                          <DialogHeader className="border-b border-gray-100 dark:border-gray-700 pb-4">
+                            <DialogTitle className="text-2xl bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                              {selectedModule?.module_title}
+                            </DialogTitle>
+                          </DialogHeader>
+                          {selectedModule && (
+                            <div className="space-y-6 pt-4">
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border-blue-100 dark:border-blue-800">
+                                  <CardHeader className="pb-3">
+                                    <CardTitle className="text-blue-700 dark:text-blue-300 flex items-center">
+                                      <BookOpen className="w-5 h-5 mr-2" />
+                                      Module Details
+                                    </CardTitle>
+                                  </CardHeader>
+                                  <CardContent className="space-y-3 text-sm">
+                                    <div className="bg-white/50 dark:bg-gray-800/50 p-3 rounded-lg">
+                                      <strong className="text-blue-600 dark:text-blue-400">Category:</strong> 
+                                      <Badge className="ml-2 bg-gradient-to-r from-emerald-500 to-teal-500">{selectedModule.category}</Badge>
+                                    </div>
+                                    <div className="bg-white/50 dark:bg-gray-800/50 p-3 rounded-lg">
+                                      <strong className="text-blue-600 dark:text-blue-400">Description:</strong> 
+                                      <p className="mt-1">{selectedModule.description}</p>
+                                    </div>
+                                    {selectedModule.delivery_notes && (
+                                      <div className="bg-white/50 dark:bg-gray-800/50 p-3 rounded-lg">
+                                        <strong className="text-blue-600 dark:text-blue-400">Delivery Notes:</strong> 
+                                        <p className="mt-1">{selectedModule.delivery_notes}</p>
+                                      </div>
+                                    )}
+                                  </CardContent>
+                                </Card>
+
+                                <Card className="bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-950/20 dark:to-amber-950/20 border-orange-100 dark:border-orange-800">
+                                  <CardHeader className="pb-3">
+                                    <CardTitle className="text-orange-700 dark:text-orange-300 flex items-center">
+                                      <Target className="w-5 h-5 mr-2" />
+                                      Configuration
+                                    </CardTitle>
+                                  </CardHeader>
+                                  <CardContent className="space-y-3 text-sm">
+                                    <div className="bg-white/50 dark:bg-gray-800/50 p-3 rounded-lg">
+                                      <strong className="text-orange-600 dark:text-orange-400">Duration:</strong> 
+                                      <span className="ml-2">{formatDuration(selectedModule.duration)}</span>
+                                    </div>
+                                    <div className="bg-white/50 dark:bg-gray-800/50 p-3 rounded-lg">
+                                      <strong className="text-orange-600 dark:text-orange-400">Format:</strong> 
+                                      <Badge variant="outline" className="ml-2 border-purple-200 text-purple-700">{selectedModule.delivery_method.format}</Badge>
+                                    </div>
+                                    <div className="bg-white/50 dark:bg-gray-800/50 p-3 rounded-lg">
+                                      <strong className="text-orange-600 dark:text-orange-400">Group Size:</strong> 
+                                      <span className="ml-2">{selectedModule.group_size.min}-{selectedModule.group_size.max} (optimal: {selectedModule.group_size.optimal})</span>
+                                    </div>
+                                  </CardContent>
+                                </Card>
+                              </div>
+
+                              {selectedModule.mindset_topics && selectedModule.mindset_topics.length > 0 && (
+                                <Card className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20 border-purple-100 dark:border-purple-800">
+                                  <CardHeader className="pb-3">
+                                    <CardTitle className="text-purple-700 dark:text-purple-300 flex items-center">
+                                      <Brain className="w-5 h-5 mr-2" />
+                                      Topics & Tags
+                                    </CardTitle>
+                                  </CardHeader>
+                                  <CardContent>
+                                    <div className="space-y-4">
+                                      <div className="bg-white/50 dark:bg-gray-800/50 p-4 rounded-lg">
+                                        <h4 className="font-medium mb-3 text-purple-600 dark:text-purple-400">Topics</h4>
+                                        <div className="flex flex-wrap gap-2">
+                                          {selectedModule.mindset_topics.map((topic, index) => (
+                                            <Badge key={index} className="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs">{topic}</Badge>
+                                          ))}
+                                        </div>
+                                      </div>
+                                      {selectedModule.tags && selectedModule.tags.length > 0 && (
+                                        <div className="bg-white/50 dark:bg-gray-800/50 p-4 rounded-lg">
+                                          <h4 className="font-medium mb-3 text-purple-600 dark:text-purple-400">Tags</h4>
+                                          <div className="flex flex-wrap gap-2">
+                                            {selectedModule.tags.map((tag, index) => (
+                                              <Badge key={index} variant="outline" className="text-xs border-purple-200 text-purple-600 dark:border-purple-700 dark:text-purple-300">{tag}</Badge>
+                                            ))}
+                                          </div>
+                                        </div>
+                                      )}
+                                    </div>
+                                  </CardContent>
+                                </Card>
+                              )}
+                            </div>
+                          )}
+                        </DialogContent>
+                      </Dialog>
+
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => startEdit(module)} 
+                        className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/30 border-green-200 dark:border-green-700 hover:from-green-100 hover:to-emerald-100 dark:hover:from-green-900/50 dark:hover:to-emerald-900/50"
+                      >
+                        <Edit className="w-4 h-4 mr-1" />
+                        Edit
                       </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Delete Training Module</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          Are you sure you want to delete "{module.module_title}"? This action cannot be undone.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={() => handleDelete(module.id)}
+                    </div>
+
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          variant="destructive"
+                          size="icon"
                           disabled={deleteLoading === module.id}
-                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                          className="bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600"
                         >
-                          {deleteLoading === module.id ? 'Deleting...' : 'Delete'}
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
+                          {deleteLoading === module.id ? 'Deleting...' : <Trash2 className="w-4 h-4" />}
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Delete Training Module</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Are you sure you want to delete "{module.module_title}"? This action cannot be undone.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction onClick={() => handleDelete(module.id)}>
+                            Delete
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
                 </div>
               </CardContent>
             </Card>
           ))}
         </div>
+      )}
 
-        {filteredModules.length === 0 && !loading && (
-          <div className="text-center py-12">
-            <BookOpen className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-            <h3 className="text-lg font-semibold mb-2">No training modules found</h3>
-            <p className="text-muted-foreground mb-4">Get started by adding your first training module or load existing ones from the database.</p>
-            <Button onClick={() => setShowAddDialog(true)}>
-              <Plus className="w-4 h-4 mr-2" />
-              Add First Module
-            </Button>
-          </div>
-        )}
-      </div>
-    </>
+      {/* Add Module Dialog */}
+      <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Add New Training Module</DialogTitle>
+          </DialogHeader>
+          <ModuleForm onSubmit={handleAdd} />
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Module Dialog */}
+      <Dialog open={!!editingModule} onOpenChange={(open) => !open && setEditingModule(null)}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Edit Training Module</DialogTitle>
+          </DialogHeader>
+          <ModuleForm onSubmit={handleEdit} isEditing />
+        </DialogContent>
+      </Dialog>
+
+      {/* AI Generator Dialog */}
+      {showAIGenerator && (
+        <AIGeneratedModules 
+          onBack={() => setShowAIGenerator(false)}
+        />
+      )}
+    </div>
   );
 }
