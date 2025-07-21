@@ -51,20 +51,26 @@ class JSONBinService {
   private headers = {
     'Content-Type': 'application/json',
     'X-Master-Key': MASTER_KEY,
+    'X-Bin-Meta': 'false',
   };
 
   async getTrainingRequirements(): Promise<TrainingRequirement[]> {
     try {
-      const response = await fetch(`${JSONBIN_BASE_URL}/b/${TRAINING_REQUIREMENTS_BIN_ID}`, {
+      console.log('Fetching training requirements from:', `${JSONBIN_BASE_URL}/b/${TRAINING_REQUIREMENTS_BIN_ID}`);
+      const response = await fetch(`${JSONBIN_BASE_URL}/b/${TRAINING_REQUIREMENTS_BIN_ID}/latest`, {
+        method: 'GET',
         headers: this.headers,
+        mode: 'cors',
       });
       
       if (!response.ok) {
-        throw new Error('Failed to fetch training requirements');
+        console.error('Response not OK:', response.status, response.statusText);
+        throw new Error(`Failed to fetch training requirements: ${response.status}`);
       }
       
       const data = await response.json();
-      return Array.isArray(data.record) ? data.record : [data.record];
+      console.log('Fetched data:', data);
+      return Array.isArray(data.record) ? data.record : (data.record ? [data.record] : []);
     } catch (error) {
       console.error('Error fetching training requirements:', error);
       return [];
@@ -109,16 +115,21 @@ class JSONBinService {
 
   async getTrainingModules(): Promise<TrainingModule[]> {
     try {
-      const response = await fetch(`${JSONBIN_BASE_URL}/b/${TRAINING_MODULES_BIN_ID}`, {
+      console.log('Fetching training modules from:', `${JSONBIN_BASE_URL}/b/${TRAINING_MODULES_BIN_ID}`);
+      const response = await fetch(`${JSONBIN_BASE_URL}/b/${TRAINING_MODULES_BIN_ID}/latest`, {
+        method: 'GET',
         headers: this.headers,
+        mode: 'cors',
       });
       
       if (!response.ok) {
-        throw new Error('Failed to fetch training modules');
+        console.error('Response not OK:', response.status, response.statusText);
+        throw new Error(`Failed to fetch training modules: ${response.status}`);
       }
       
       const data = await response.json();
-      return Array.isArray(data.record) ? data.record : [data.record];
+      console.log('Fetched modules data:', data);
+      return Array.isArray(data.record) ? data.record : (data.record ? [data.record] : []);
     } catch (error) {
       console.error('Error fetching training modules:', error);
       return [];

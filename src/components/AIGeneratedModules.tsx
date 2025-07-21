@@ -55,12 +55,20 @@ export function AIGeneratedModules({ onBack }: { onBack?: () => void }) {
   const { toast } = useToast();
 
   const generateSystemPrompt = () => {
-    const prompt = `You are an expert in interactive training programme design. You will search for interactive training modules that focus on the training topic input by user, with a duration between 10 to 60 minutes. For each module found, return the results in the following structured format:
+    const prompt = `You are an expert training facilitator and instructional designer with access to a comprehensive database of real-world training materials. Your task is to find and recommend actual, existing interactive training modules that focus on the specified training topic, with durations between 10-60 minutes.
+
+For each module, provide REAL examples with:
+- Detailed step-by-step facilitation instructions that a trainer can follow verbatim
+- Actual downloadable resources (presentations, handouts, worksheets)
+- Specific activity descriptions with timing, group configurations, and materials needed
+- Real-world examples and case studies to use during delivery
+
+Return results in this structured format:
 
 {
   "moduleID": "string",
   "moduleTitle": "string", 
-  "description": "string",
+  "description": "Detailed step-by-step facilitation guide including: opening (5 min), main activities with specific instructions and timing, group exercises with exact setup, discussion questions to ask, and closing summary. Include specific examples, scenarios, or case studies to use.",
   "category": "string",
   "tags": ["string"],
   "duration": "number (minutes)",
@@ -70,30 +78,39 @@ export function AIGeneratedModules({ onBack }: { onBack?: () => void }) {
   },
   "groupSize": {
     "min": "number",
-    "max": "number",
+    "max": "number", 
     "optimal": "number",
     "optimal breakout size": "number"
   },
   "mindsetTopics": ["string"],
-  "deliveryNotes": "string",
+  "deliveryNotes": "Specific facilitation tips, potential challenges, and how to adapt for virtual vs in-person delivery",
   "sampleMaterials": [
     {
       "materialType": "presentation|facilitator_guide|handout|worksheet|etc",
       "filename": "string",
-      "fileFormat": "pptx|pdf|jpeg",
-      "fileUrl": "string"
+      "fileFormat": "pptx|pdf|docx",
+      "fileUrl": "string (real downloadable link)"
     }
   ],
   "createdAt": "ISO date",
   "updatedAt": "ISO date"
 }
 
-Only include modules that are practical, engaging, and suitable for virtual or in-person training. Each item must fill in all available fields to the best extent possible. Return the response as a valid JSON array.`;
+Focus on modules that are practical, tested in real training environments, and include downloadable materials from reputable training organizations, universities, or corporate learning platforms. Return the response as a valid JSON array.`;
     setSystemPrompt(prompt);
   };
 
   const generateUserPrompt = () => {
-    const prompt = `Please conduct the research for the training topic of ${trainingTopic}`;
+    const prompt = `Please find real, existing training modules for the topic: "${trainingTopic}". 
+
+Requirements:
+- Include actual facilitator guides with step-by-step instructions
+- Provide real downloadable materials (slides, handouts, worksheets)
+- Focus on interactive modules with proven track records
+- Include specific examples, scenarios, or case studies for each module
+- Ensure descriptions are detailed enough for a facilitator to run the session immediately
+
+Return 3-5 high-quality modules with complete facilitation details and real resource links.`;
     setUserPrompt(prompt);
   };
 
