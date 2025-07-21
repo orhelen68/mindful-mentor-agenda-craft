@@ -441,10 +441,13 @@ Return 3-5 high-quality modules, each containing ONE focused activity with compl
               )}
 
               <div className="flex gap-4">
-                {parsedModules.length > 0 && (
-                  <Button onClick={handleConfirmResponse}>
+                {aiResponse && (
+                  <Button 
+                    onClick={handleConfirmResponse}
+                    disabled={parsedModules.length === 0}
+                  >
                     <CheckCircle className="w-4 h-4 mr-2" />
-                    Confirm & Save Modules
+                    {parsedModules.length > 0 ? 'Confirm & Save Modules' : 'No Valid Modules to Save'}
                   </Button>
                 )}
                 <Button variant="outline" onClick={() => setStep(1)}>
