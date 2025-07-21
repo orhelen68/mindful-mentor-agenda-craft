@@ -47,7 +47,7 @@ export function AIGeneratedAgendaDialog({
   const { toast } = useToast();
 
   const generatePrompts = () => {
-    if (!requirement) return;
+    if (!requirement) return { systemPrompt: '', userPrompt: '' };
 
     const systemPrompt = `You are an expert training designer with 20+ years of experience creating engaging, effective training agendas. Your expertise includes:
 
@@ -150,9 +150,11 @@ The response must be valid JSON following this exact schema:
 
     setSystemPrompt(systemPrompt);
     setUserPrompt(userPrompt);
+    
+    return { systemPrompt, userPrompt };
   };
 
-  const generateAgenda = async () => {
+  const generateAgenda = async (prompts?: { systemPrompt: string; userPrompt: string }) => {
     if (!apiKey || !selectedModel) {
       toast({
         title: "Missing Information",
@@ -162,9 +164,26 @@ The response must be valid JSON following this exact schema:
       return;
     }
 
+    // Use provided prompts or fallback to state
+    const systemPromptToUse = prompts?.systemPrompt || systemPrompt;
+    const userPromptToUse = prompts?.userPrompt || userPrompt;
+
+    if (!systemPromptToUse || !userPromptToUse) {
+      toast({
+        title: "Missing Prompts",
+        description: "System or user prompts are not available",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsGenerating(true);
     setStep('generating');
     setError('');
+
+    // Update state with the prompts being used
+    setSystemPrompt(systemPromptToUse);
+    setUserPrompt(userPromptToUse);
 
     try {
       const modelToUse = selectedModel === 'custom' ? customModel : selectedModel;
@@ -179,8 +198,8 @@ The response must be valid JSON following this exact schema:
         body: JSON.stringify({
           model: modelToUse,
           messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: userPrompt }
+            { role: 'system', content: systemPromptToUse },
+            { role: 'user', content: userPromptToUse }
           ],
           temperature: 0.7,
           max_tokens: 4000
@@ -331,11 +350,8 @@ The response must be valid JSON following this exact schema:
             <div className="flex gap-3">
               <Button 
                 onClick={async () => {
-                  generatePrompts();
-                  // Small delay to ensure prompts are set before generating
-                  setTimeout(() => {
-                    generateAgenda();
-                  }, 100);
+                  const prompts = generatePrompts();
+                  await generateAgenda(prompts);
                 }}
                 disabled={!apiKey || !selectedModel || (selectedModel === 'custom' && !customModel) || isGenerating}
                 className="flex-1"
