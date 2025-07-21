@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      training_agendas: {
+        Row: {
+          created_at: string
+          facilitator_notes: string | null
+          id: string
+          materials_list: string[] | null
+          overview: Json
+          post_workshop_follow_up: string[] | null
+          pre_reading: string[] | null
+          timeslots: Json
+          training_id: string
+          training_title: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          facilitator_notes?: string | null
+          id?: string
+          materials_list?: string[] | null
+          overview: Json
+          post_workshop_follow_up?: string[] | null
+          pre_reading?: string[] | null
+          timeslots: Json
+          training_id: string
+          training_title: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          facilitator_notes?: string | null
+          id?: string
+          materials_list?: string[] | null
+          overview?: Json
+          post_workshop_follow_up?: string[] | null
+          pre_reading?: string[] | null
+          timeslots?: Json
+          training_id?: string
+          training_title?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       training_modules: {
         Row: {
           category: string | null

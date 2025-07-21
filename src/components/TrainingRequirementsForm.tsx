@@ -437,9 +437,19 @@ export function TrainingRequirementsForm({ onSuccess }: { onSuccess?: () => void
                 </div>
               </div>
 
-              <Button type="submit" disabled={isSubmitting} className="w-full h-12 text-lg">
-                {isSubmitting ? 'Saving...' : 'Save Training Requirements'}
-              </Button>
+              <div className="space-y-3">
+                <Button type="submit" disabled={isSubmitting} className="w-full h-12 text-lg">
+                  {isSubmitting ? 'Saving...' : 'Save Training Requirements'}
+                </Button>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  className="w-full h-12 text-lg"
+                  onClick={() => window.location.href = '/create-agenda'}
+                >
+                  Create Training Agenda
+                </Button>
+              </div>
             </form>
           </Form>
         </CardContent>
