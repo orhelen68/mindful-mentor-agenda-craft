@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Brain, Send, CheckCircle, AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { jsonBinService } from '@/services/jsonbin';
+import { supabase } from '@/integrations/supabase/client';
 
 interface AIResponse {
   moduleID: string;
@@ -224,26 +224,31 @@ Return 3-5 high-quality modules, each containing ONE focused activity with compl
     }
 
     try {
-      // Convert AI response format to our training module format
+      // Convert AI response format to our Supabase training module format
       for (const module of parsedModules) {
         const trainingModule = {
-          id: module.moduleID || crypto.randomUUID(),
-          title: module.moduleTitle,
+          module_id: module.moduleID || crypto.randomUUID(),
+          module_title: module.moduleTitle,
           description: module.description,
-          objectives: module.mindsetTopics || [],
-          duration: module.duration,
-          materials: module.sampleMaterials?.map(m => `${m.materialType}: ${m.filename}`) || [],
-          activities: [{
-            type: 'lecture' as const,
-            description: module.deliveryNotes || 'Generated module activity',
-            duration: module.duration
-          }],
+          facilitator: module.facilitator,
+          participant: module.participant,
+          category: module.category,
           tags: module.tags || [],
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
+          duration: module.duration,
+          delivery_method: module.deliveryMethod,
+          group_size: module.groupSize,
+          mindset_topics: module.mindsetTopics || [],
+          delivery_notes: module.deliveryNotes,
+          sample_materials: module.sampleMaterials || [],
         };
 
-        await jsonBinService.createTrainingModule(trainingModule);
+        const { error } = await supabase
+          .from('training_modules')
+          .insert([trainingModule]);
+
+        if (error) {
+          throw error;
+        }
       }
 
       toast({
@@ -258,6 +263,7 @@ Return 3-5 high-quality modules, each containing ONE focused activity with compl
       setAiError('');
       setParsedModules([]);
     } catch (error) {
+      console.error('Error saving modules:', error);
       toast({
         title: 'Error',
         description: 'Failed to save modules to database',
