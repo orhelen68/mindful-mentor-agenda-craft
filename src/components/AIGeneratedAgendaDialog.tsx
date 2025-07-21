@@ -35,13 +35,14 @@ export function AIGeneratedAgendaDialog({
   availableModules,
   onAgendaGenerated 
 }: AIGeneratedAgendaDialogProps) {
-  const [step, setStep] = useState<'setup' | 'generating' | 'review'>('setup');
+  const [step, setStep] = useState<'setup' | 'generating' | 'review' | 'preview'>('setup');
   const [apiKey, setApiKey] = useState('');
   const [selectedModel, setSelectedModel] = useState('');
   const [customModel, setCustomModel] = useState('');
   const [systemPrompt, setSystemPrompt] = useState('');
   const [userPrompt, setUserPrompt] = useState('');
   const [aiResponse, setAiResponse] = useState('');
+  const [parsedAgenda, setParsedAgenda] = useState<any>(null);
   const [error, setError] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
@@ -266,14 +267,8 @@ The response must be valid JSON following this exact schema:
       };
 
       console.log('Final Agenda Object:', agenda);
-      onAgendaGenerated(agenda);
-      onOpenChange(false);
-      resetDialog();
-      
-      toast({
-        title: "Agenda Generated",
-        description: "AI-generated training agenda has been created successfully",
-      });
+      setParsedAgenda(agenda);
+      setStep('preview');
     } catch (err) {
       console.error('JSON Parsing Error:', err);
       console.error('Failed Response:', aiResponse);
@@ -281,6 +276,19 @@ The response must be valid JSON following this exact schema:
         title: "Invalid Response",
         description: `The AI response is not valid JSON: ${err instanceof Error ? err.message : 'Unknown error'}`,
         variant: "destructive"
+      });
+    }
+  };
+
+  const finalizeAgenda = () => {
+    if (parsedAgenda) {
+      onAgendaGenerated(parsedAgenda);
+      onOpenChange(false);
+      resetDialog();
+      
+      toast({
+        title: "Agenda Generated",
+        description: "AI-generated training agenda has been created successfully",
       });
     }
   };
@@ -482,6 +490,150 @@ The response must be valid JSON following this exact schema:
                 onClick={() => setStep('setup')}
               >
                 Back to Setup
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={() => handleOpenChange(false)}
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {step === 'preview' && parsedAgenda && (
+          <div className="space-y-6">
+            <div className="flex items-center gap-2">
+              <CheckCircle className="h-5 w-5 text-green-500" />
+              <h3 className="text-lg font-semibold">Preview Training Agenda</h3>
+            </div>
+
+            <div className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle>{parsedAgenda.training_title}</CardTitle>
+                  <p className="text-muted-foreground">{parsedAgenda.overview?.description}</p>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <strong>Duration:</strong> {parsedAgenda.overview?.totalDuration} minutes
+                    </div>
+                    <div>
+                      <strong>Group Size:</strong> {parsedAgenda.overview?.groupSize}
+                    </div>
+                  </div>
+                  
+                  {parsedAgenda.overview?.trainingObjectives && (
+                    <div className="mt-4">
+                      <strong className="text-sm">Learning Objectives:</strong>
+                      <ul className="list-disc list-inside text-sm mt-2 space-y-1">
+                        {parsedAgenda.overview.trainingObjectives.map((objective: string, index: number) => (
+                          <li key={index}>{objective}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Agenda Timeline</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {parsedAgenda.timeslots?.map((timeslot: any, index: number) => (
+                      <div key={index} className="flex items-start gap-3 p-3 border rounded-lg">
+                        <div className="flex-shrink-0 text-sm font-mono bg-muted px-2 py-1 rounded">
+                          {timeslot.startTime}
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <Badge variant="outline" className="text-xs">
+                              {timeslot.activityType}
+                            </Badge>
+                            <span className="text-xs text-muted-foreground">
+                              {timeslot.duration}min
+                            </span>
+                          </div>
+                          {timeslot.activityType === 'module' && timeslot.activityDetails?.module && (
+                            <div className="text-sm">
+                              <strong>Module:</strong> {timeslot.activityDetails.module.moduleID}
+                            </div>
+                          )}
+                          {timeslot.activityType === 'formality' && timeslot.activityDetails?.formality && (
+                            <div className="text-sm">
+                              <strong>Formality:</strong> {timeslot.activityDetails.formality.formalityType}
+                            </div>
+                          )}
+                          {timeslot.activityType === 'discussion' && timeslot.activityDetails?.discussion && (
+                            <div className="text-sm">
+                              <strong>Discussion:</strong> {timeslot.activityDetails.discussion.discussionTopic}
+                              <br />
+                              <span className="text-muted-foreground">Type: {timeslot.activityDetails.discussion.discussionType}</span>
+                            </div>
+                          )}
+                          {timeslot.activityType === 'break' && timeslot.activityDetails?.break && (
+                            <div className="text-sm">
+                              <strong>Break:</strong> {timeslot.activityDetails.break.breakType}
+                            </div>
+                          )}
+                          {timeslot.notes && (
+                            <p className="text-xs text-muted-foreground mt-1">{timeslot.notes}</p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {(parsedAgenda.pre_reading?.length > 0 || parsedAgenda.post_workshop_follow_up?.length > 0) && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {parsedAgenda.pre_reading?.length > 0 && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-sm">Pre-Reading</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <ul className="list-disc list-inside text-sm space-y-1">
+                          {parsedAgenda.pre_reading.map((item: string, index: number) => (
+                            <li key={index}>{item}</li>
+                          ))}
+                        </ul>
+                      </CardContent>
+                    </Card>
+                  )}
+                  
+                  {parsedAgenda.post_workshop_follow_up?.length > 0 && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-sm">Follow-up Actions</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <ul className="list-disc list-inside text-sm space-y-1">
+                          {parsedAgenda.post_workshop_follow_up.map((item: string, index: number) => (
+                            <li key={index}>{item}</li>
+                          ))}
+                        </ul>
+                      </CardContent>
+                    </Card>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <div className="flex gap-3">
+              <Button onClick={finalizeAgenda} className="flex-1">
+                <CheckCircle className="h-4 w-4 mr-2" />
+                Create This Agenda
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={() => setStep('review')}
+              >
+                Back to Review
               </Button>
               <Button 
                 variant="outline" 
