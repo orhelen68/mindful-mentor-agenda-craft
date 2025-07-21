@@ -495,17 +495,46 @@ export function TrainingRequirementsForm({ onSuccess }: { onSuccess?: () => void
                   type="button" 
                   variant="outline" 
                   className="w-full h-12 text-lg bg-gradient-to-r from-purple-50 to-blue-50 border-purple-200 hover:from-purple-100 hover:to-blue-100"
-                  onClick={() => setShowAIDialog(true)}
-                  disabled={!savedRequirement}
+                  onClick={() => {
+                    const formData = form.getValues();
+                    if (formData.trainingID && formData.trainingTitle && formData.description) {
+                      // Create a temporary requirement object from current form data
+                      const tempRequirement = {
+                        training_id: formData.trainingID,
+                        training_title: formData.trainingTitle,
+                        description: formData.description,
+                        target_audience: {
+                          experienceLevel: formData.targetAudience.experienceLevel,
+                          industryContext: formData.targetAudience.industryContext,
+                        },
+                        constraints: {
+                          duration: formData.constraints.duration,
+                          interactionLevel: formData.constraints.interactionLevel,
+                        },
+                        mindset_focus: {
+                          learningObjectives: formData.mindsetFocus.learningObjectives.map(obj => obj.value).filter(val => val.trim() !== ''),
+                          primaryTopics: formData.mindsetFocus.primaryTopics.map(topic => topic.value).filter(val => val.trim() !== ''),
+                          secondaryTopics: formData.mindsetFocus.secondaryTopics.map(topic => topic.value).filter(val => val.trim() !== ''),
+                        },
+                        delivery_preferences: {
+                          format: formData.deliveryPreferences.format,
+                          groupSize: formData.deliveryPreferences.groupSize,
+                        },
+                      };
+                      setSavedRequirement(tempRequirement as TrainingRequirement);
+                      setShowAIDialog(true);
+                    } else {
+                      toast({
+                        title: "Missing Information",
+                        description: "Please fill in at least Training ID, Title, and Description before using AI generation.",
+                        variant: "destructive"
+                      });
+                    }
+                  }}
                 >
                   <Brain className="h-5 w-5 mr-2" />
                   AI Generate Training Agenda
                 </Button>
-                {!savedRequirement && (
-                  <p className="text-xs text-muted-foreground text-center">
-                    Save training requirements first to enable AI generation
-                  </p>
-                )}
               </div>
             </form>
           </Form>
