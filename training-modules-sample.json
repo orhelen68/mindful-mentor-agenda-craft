@@ -1,0 +1,80 @@
+[
+  {
+    "moduleID": "mod_001",
+    "moduleTitle": "Leadership Confidence Building",
+    "description": "Interactive exercises to build self-confidence and leadership presence",
+    "category": "Leadership Development",
+    "tags": ["confidence", "leadership", "self-awareness", "presence"],
+    "duration": 90,
+    "deliveryMethod": {
+      "format": "exercise",
+      "breakout": "yes"
+    },
+    "groupSize": {
+      "min": 8,
+      "max": 16,
+      "optimal": 12,
+      "optimal breakout size": 4
+    },
+    "mindsetTopics": ["leadership confidence", "self-awareness", "personal presence"],
+    "deliveryNotes": "Start with individual reflection, move to pair sharing, then small group exercises. Use role-play scenarios relevant to participants' work contexts.",
+    "sampleMaterials": [
+      {
+        "materialType": "presentation",
+        "filename": "leadership-confidence-slides.pptx",
+        "fileFormat": "pptx",
+        "fileUrl": "https://sample-url.com/slides1.pptx"
+      },
+      {
+        "materialType": "facilitator_guide",
+        "filename": "confidence-facilitator-guide.pdf",
+        "fileFormat": "pdf",
+        "fileUrl": "https://sample-url.com/guide1.pdf"
+      },
+      {
+        "materialType": "worksheet",
+        "filename": "confidence-self-assessment.pdf",
+        "fileFormat": "pdf",
+        "fileUrl": "https://sample-url.com/worksheet1.pdf"
+      }
+    ],
+    "createdAt": "2024-01-10T10:00:00Z",
+    "updatedAt": "2024-01-10T10:00:00Z"
+  },
+  {
+    "moduleID": "mod_002",
+    "moduleTitle": "Effective Communication Styles",
+    "description": "Explore different communication styles and practice adaptive communication techniques",
+    "category": "Communication Skills",
+    "tags": ["communication", "styles", "adaptation", "listening"],
+    "duration": 75,
+    "deliveryMethod": {
+      "format": "game",
+      "breakout": "no"
+    },
+    "groupSize": {
+      "min": 6,
+      "max": 20,
+      "optimal": 12,
+      "optimal breakout size": 3
+    },
+    "mindsetTopics": ["communication", "empathy", "active listening"],
+    "deliveryNotes": "Use communication style assessment followed by interactive games. Include practice scenarios with feedback rounds.",
+    "sampleMaterials": [
+      {
+        "materialType": "presentation",
+        "filename": "communication-styles-overview.pptx",
+        "fileFormat": "pptx",
+        "fileUrl": "https://sample-url.com/slides2.pptx"
+      },
+      {
+        "materialType": "handout",
+        "filename": "communication-styles-reference.pdf",
+        "fileFormat": "pdf",
+        "fileUrl": "https://sample-url.com/handout1.pdf"
+      }
+    ],
+    "createdAt": "2024-01-11T14:00:00Z",
+    "updatedAt": "2024-01-11T14:00:00Z"
+  }
+]

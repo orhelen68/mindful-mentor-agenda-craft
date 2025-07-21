@@ -1,0 +1,29 @@
+{
+  "trainingID": "req_001",
+  "trainingTitle": "Leadership Mindset for New Managers",
+  "description": "Develop confident leadership mindset and essential management skills for newly promoted team leaders",
+  "targetAudience": {
+    "experienceLevel": "beginner",
+    "industryContext": "Technology and startup companies"
+  },
+  "constraints": {
+    "duration": "2 days",
+    "interactionLevel": "high"
+  },
+  "mindsetFocus": {
+    "learningObjectives": [
+      "Develop confidence in leadership role",
+      "Build effective communication skills",
+      "Learn conflict resolution techniques",
+      "Understand team motivation strategies"
+    ],
+    "primaryTopics": ["leadership confidence", "communication", "team management"],
+    "secondaryTopics": ["emotional intelligence", "decision making", "feedback delivery"]
+  },
+  "deliveryPreferences": {
+    "format": "in-person",
+    "groupSize": 12
+  },
+  "createdAt": "2024-01-15T09:00:00Z",
+  "updatedAt": "2024-01-15T09:00:00Z"
+}

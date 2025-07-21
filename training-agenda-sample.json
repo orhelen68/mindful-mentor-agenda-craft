@@ -1,0 +1,110 @@
+{
+  "trainingID": "agenda_001",
+  "trainingTitle": "Leadership Mindset for New Managers",
+  "overview": {
+    "description": "A comprehensive 2-day program designed to develop confident leadership mindset and essential management skills",
+    "trainingObjectives": [
+      "Develop confidence in leadership role",
+      "Build effective communication skills", 
+      "Learn conflict resolution techniques",
+      "Understand team motivation strategies"
+    ],
+    "totalDuration": 960,
+    "groupSize": 12
+  },
+  "timeslots": [
+    {
+      "sequenceNumber": 1,
+      "startTime": "09:00",
+      "duration": 30,
+      "activityType": "formality",
+      "activityDetails": {
+        "formalityType": "opening"
+      },
+      "notes": "Welcome, introductions, and agenda overview"
+    },
+    {
+      "sequenceNumber": 2,
+      "startTime": "09:30",
+      "duration": 90,
+      "activityType": "module",
+      "activityDetails": {
+        "moduleID": "mod_001"
+      },
+      "notes": "Leadership Confidence Building module"
+    },
+    {
+      "sequenceNumber": 3,
+      "startTime": "11:00",
+      "duration": 15,
+      "activityType": "break",
+      "activityDetails": {
+        "breakType": "tea"
+      },
+      "notes": "Morning tea break"
+    },
+    {
+      "sequenceNumber": 4,
+      "startTime": "11:15",
+      "duration": 75,
+      "activityType": "module",
+      "activityDetails": {
+        "moduleID": "mod_002"
+      },
+      "notes": "Communication Styles module"
+    },
+    {
+      "sequenceNumber": 5,
+      "startTime": "12:30",
+      "duration": 60,
+      "activityType": "break",
+      "activityDetails": {
+        "breakType": "lunch"
+      },
+      "notes": "Lunch break"
+    },
+    {
+      "sequenceNumber": 6,
+      "startTime": "13:30",
+      "duration": 45,
+      "activityType": "discussion",
+      "activityDetails": {
+        "discussionType": "breakout",
+        "discussionTopic": "Applying leadership concepts in your context"
+      },
+      "notes": "Small group discussions and sharing"
+    },
+    {
+      "sequenceNumber": 7,
+      "startTime": "14:15",
+      "duration": 30,
+      "activityType": "sharing",
+      "activityDetails": {
+        "speaker": "External Expert",
+        "topic": "Real-world leadership challenges and solutions"
+      },
+      "notes": "Guest speaker session"
+    },
+    {
+      "sequenceNumber": 8,
+      "startTime": "14:45",
+      "duration": 15,
+      "activityType": "formality",
+      "activityDetails": {
+        "formalityType": "closing"
+      },
+      "notes": "Day 1 wrap-up and Day 2 preview"
+    }
+  ],
+  "preReading": [
+    "Leadership fundamentals article",
+    "Self-assessment questionnaire"
+  ],
+  "postWorkshopFollowUp": [
+    "30-day leadership action plan template",
+    "Monthly check-in sessions with manager",
+    "Online resource library access"
+  ],
+  "createdAt": "2024-01-15T09:00:00Z",
+  "updatedAt": "2024-01-15T09:00:00Z"
+}

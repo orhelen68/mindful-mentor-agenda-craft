@@ -1,0 +1,77 @@
+{
+  "trainingID": "bp_001",
+  "trainingTitle": "Leadership Mindset for New Managers",
+  "deliveryRecommendations": {
+    "facilitatorTips": [
+      "Create psychological safety from the start",
+      "Use real workplace scenarios for role-plays",
+      "Encourage vulnerability and authentic sharing",
+      "Balance individual reflection with group activities",
+      "Check energy levels frequently and adjust as needed"
+    ],
+    "timingConsiderations": [
+      "Allow extra time for discussions - new managers have many questions",
+      "Schedule reflection activities after lunch when energy may be lower",
+      "Build in buffer time between modules for processing",
+      "End Day 1 with something energizing and forward-looking"
+    ],
+    "engagementStrategies": [
+      "Use participant names frequently",
+      "Create opportunities for peer learning and support",
+      "Include movement and kinesthetic activities",
+      "Vary group sizes throughout the day",
+      "Use storytelling to illustrate key concepts"
+    ],
+    "commonChallenges": [
+      "Participants may feel overwhelmed by new responsibilities",
+      "Some may resist authority or struggle with imposter syndrome",
+      "Different experience levels require differentiated approaches",
+      "Time management can be challenging with interactive exercises"
+    ],
+    "adaptationSuggestions": [
+      "For virtual delivery: use breakout rooms extensively and shorter modules",
+      "For larger groups: assign co-facilitators and increase breakout activities",
+      "For mixed experience levels: create mentoring pairs",
+      "For time constraints: focus on most critical modules and provide additional resources"
+    ]
+  },
+  "materialSuggestions": {
+    "requiredMaterials": [
+      "Flip chart paper and markers for each table",
+      "Name badges and table tents",
+      "Participant workbooks",
+      "Sticky notes (multiple colors)",
+      "Timer for activities"
+    ],
+    "optionalEnhancements": [
+      "Leadership assessment tools",
+      "Video clips for scenario discussions",
+      "Props for role-play exercises",
+      "Background music for reflection activities",
+      "Certificate templates for completion"
+    ],
+    "technologyNeeds": [
+      "Projector and screen",
+      "Wireless presenter remote",
+      "Audio system with wireless microphone",
+      "Laptop with backup presentation files",
+      "Extension cords and power strips"
+    ],
+    "roomSetupRecommendations": [
+      "Round tables for 4-6 participants each",
+      "Open space for movement and standing activities",
+      "Comfortable breakout areas",
+      "Natural lighting when possible",
+      "Temperature control access"
+    ],
+    "takeawayMaterials": [
+      "Personalized action plan templates",
+      "Resource list with books and articles",
+      "Contact information for peer network",
+      "Digital access to presentation slides",
+      "Follow-up activity suggestions"
+    ]
+  },
+  "createdAt": "2024-01-15T09:00:00Z",
+  "updatedAt": "2024-01-15T09:00:00Z"
+}
