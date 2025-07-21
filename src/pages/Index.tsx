@@ -25,7 +25,7 @@ const Index = () => {
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="requirements-form" className="flex items-center gap-2">
               <FileText className="w-4 h-4" />
-              Create Requirements
+              Input Training Requirements
             </TabsTrigger>
             <TabsTrigger value="requirements-management" className="flex items-center gap-2">
               <Settings className="w-4 h-4" />

@@ -155,6 +155,14 @@ class JSONBinService {
     await this.updateTrainingModules(modules);
   }
 
+  async createTrainingModule(moduleData: TrainingModule): Promise<TrainingModule> {
+    const currentModules = await this.getTrainingModules();
+    const updatedModules = [...currentModules, moduleData];
+    
+    await this.updateTrainingModules(updatedModules);
+    return moduleData;
+  }
+
   async updateTrainingModule(id: string, updatedModule: Partial<TrainingModule>): Promise<void> {
     const modules = await this.getTrainingModules();
     const moduleIndex = modules.findIndex(mod => mod.id === id);

@@ -148,42 +148,36 @@ export function TrainingRequirementsManagement() {
                               </ul>
                             </div>
 
-                            <div>
-                              <h3 className="font-semibold mb-2">Topics</h3>
+                            <div className="mb-3">
+                              <h4 className="font-medium mb-1">Primary Topics:</h4>
+                              <ul className="list-disc list-inside space-y-1">
+                                {selectedRequirement.mindsetFocus.primaryTopics.map((topic, index) => (
+                                  <li key={index} className="text-sm">{topic}</li>
+                                ))}
+                              </ul>
+                            </div>
+                            {selectedRequirement.mindsetFocus.secondaryTopics.length > 0 && (
                               <div className="mb-3">
-                                <h4 className="font-medium mb-1">Primary Topics:</h4>
+                                <h4 className="font-medium mb-1">Secondary Topics:</h4>
                                 <ul className="list-disc list-inside space-y-1">
-                                  {selectedRequirement.mindsetFocus.primaryTopics.map((topic, index) => (
+                                  {selectedRequirement.mindsetFocus.secondaryTopics.map((topic, index) => (
                                     <li key={index} className="text-sm">{topic}</li>
                                   ))}
                                 </ul>
                               </div>
-                              {selectedRequirement.mindsetFocus.secondaryTopics.length > 0 && (
-                                <div>
-                                  <h4 className="font-medium mb-1">Secondary Topics:</h4>
-                                  <ul className="list-disc list-inside space-y-1">
-                                    {selectedRequirement.mindsetFocus.secondaryTopics.map((topic, index) => (
-                                      <li key={index} className="text-sm">{topic}</li>
-                                    ))}
-                                  </ul>
-                                </div>
-                              )}
-                            </div>
+                            )}
 
-                            <div>
-                              <h3 className="font-semibold mb-2">Constraints</h3>
+                            <div className="mb-3">
                               <p className="text-sm mb-1"><strong>Duration:</strong> {formatDuration(selectedRequirement.constraints.duration)}</p>
                               <p className="text-sm"><strong>Interaction Level:</strong> {selectedRequirement.constraints.interactionLevel}</p>
                             </div>
 
-                            <div>
-                              <h3 className="font-semibold mb-2">Target Audience</h3>
+                            <div className="mb-3">
                               <p className="text-sm mb-1"><strong>Experience Level:</strong> {selectedRequirement.targetAudience.experienceLevel}</p>
                               <p className="text-sm mb-1"><strong>Industry Context:</strong> {selectedRequirement.targetAudience.industryContext}</p>
                             </div>
 
-                            <div>
-                              <h3 className="font-semibold mb-2">Delivery Preferences</h3>
+                            <div className="mb-3">
                               <p className="text-sm mb-1"><strong>Format:</strong> {selectedRequirement.deliveryPreferences.format}</p>
                               <p className="text-sm"><strong>Group Size:</strong> {selectedRequirement.deliveryPreferences.groupSize}</p>
                             </div>

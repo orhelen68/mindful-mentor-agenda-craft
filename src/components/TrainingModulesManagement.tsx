@@ -7,13 +7,14 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Trash2, Eye, Edit, Plus, Clock, BookOpen } from 'lucide-react';
+import { Trash2, Eye, Edit, Plus, Clock, BookOpen, Brain } from 'lucide-react';
 import { jsonBinService, TrainingModule } from '@/services/jsonbin';
 import { useToast } from '@/hooks/use-toast';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { AIGeneratedModules } from './AIGeneratedModules';
 
 const activitySchema = z.object({
   type: z.enum(['lecture', 'discussion', 'exercise', 'case_study', 'role_play']),
@@ -40,6 +41,7 @@ export function TrainingModulesManagement() {
   const [deleteLoading, setDeleteLoading] = useState<string | null>(null);
   const [editingModule, setEditingModule] = useState<TrainingModule | null>(null);
   const [showAddDialog, setShowAddDialog] = useState(false);
+  const [showAIGenerator, setShowAIGenerator] = useState(false);
   const { toast } = useToast();
 
   const form = useForm<TrainingModuleFormData>({
@@ -50,7 +52,7 @@ export function TrainingModulesManagement() {
       objectives: [''],
       duration: 60,
       materials: [''],
-      activities: [{ type: 'lecture', description: '', duration: 30 }],
+      activities: [{ type: 'lecture' as const, description: '', duration: 30 }],
       tags: [''],
     },
   });
@@ -176,6 +178,11 @@ export function TrainingModulesManagement() {
     return `${mins}m`;
   };
 
+  const appendObjectiveHelper = () => appendObjective('');
+  const appendMaterialHelper = () => appendMaterial('');
+  const appendTagHelper = () => appendTag('');
+  const appendActivityHelper = () => appendActivity({ type: 'lecture' as const, description: '', duration: 30 });
+
   const ModuleForm = ({ onSubmit, isEditing = false }: { onSubmit: (data: TrainingModuleFormData) => void; isEditing?: boolean }) => (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -256,7 +263,7 @@ export function TrainingModulesManagement() {
             type="button"
             variant="outline"
             size="sm"
-            onClick={() => appendObjective('')}
+            onClick={appendObjectiveHelper}
             className="mt-2"
           >
             <Plus className="h-4 w-4 mr-2" />
@@ -294,7 +301,7 @@ export function TrainingModulesManagement() {
             type="button"
             variant="outline"
             size="sm"
-            onClick={() => appendMaterial('')}
+            onClick={appendMaterialHelper}
             className="mt-2"
           >
             <Plus className="h-4 w-4 mr-2" />
@@ -378,7 +385,7 @@ export function TrainingModulesManagement() {
             type="button"
             variant="outline"
             size="sm"
-            onClick={() => appendActivity({ type: 'lecture', description: '', duration: 30 })}
+            onClick={appendActivityHelper}
             className="mt-2"
           >
             <Plus className="h-4 w-4 mr-2" />
@@ -416,7 +423,7 @@ export function TrainingModulesManagement() {
             type="button"
             variant="outline"
             size="sm"
-            onClick={() => appendTag('')}
+            onClick={appendTagHelper}
             className="mt-2"
           >
             <Plus className="h-4 w-4 mr-2" />
@@ -444,6 +451,13 @@ export function TrainingModulesManagement() {
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Training Modules Management</h2>
         <div className="flex gap-2">
+          <Button
+            onClick={() => setShowAIGenerator(!showAIGenerator)}
+            variant={showAIGenerator ? "default" : "outline"}
+          >
+            <Brain className="w-4 h-4 mr-2" />
+            AI Generated Modules
+          </Button>
           <Button onClick={loadModules} variant="outline">
             Refresh
           </Button>
@@ -645,6 +659,12 @@ export function TrainingModulesManagement() {
               </CardHeader>
             </Card>
           ))}
+        </div>
+      )}
+
+      {showAIGenerator && (
+        <div className="mt-6">
+          <AIGeneratedModules />
         </div>
       )}
     </div>
