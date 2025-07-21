@@ -235,8 +235,23 @@ The response must be valid JSON following this exact schema:
 
   const confirmAgenda = () => {
     try {
+      console.log('Raw AI Response:', aiResponse);
+      
+      // Clean the response - remove markdown code blocks if present
+      let cleanedResponse = aiResponse.trim();
+      
+      // Remove markdown code blocks
+      if (cleanedResponse.startsWith('```json')) {
+        cleanedResponse = cleanedResponse.replace(/^```json\s*/, '').replace(/\s*```$/, '');
+      } else if (cleanedResponse.startsWith('```')) {
+        cleanedResponse = cleanedResponse.replace(/^```\s*/, '').replace(/\s*```$/, '');
+      }
+      
+      console.log('Cleaned Response:', cleanedResponse);
+      
       // Parse and validate the JSON response
-      const agendaData = JSON.parse(aiResponse);
+      const agendaData = JSON.parse(cleanedResponse);
+      console.log('Parsed Agenda Data:', agendaData);
       
       // Convert to our internal format
       const agenda: Omit<TrainingAgendaFormData, 'id' | 'created_at' | 'updated_at'> = {
@@ -250,6 +265,7 @@ The response must be valid JSON following this exact schema:
         materials_list: []
       };
 
+      console.log('Final Agenda Object:', agenda);
       onAgendaGenerated(agenda);
       onOpenChange(false);
       resetDialog();
@@ -259,9 +275,11 @@ The response must be valid JSON following this exact schema:
         description: "AI-generated training agenda has been created successfully",
       });
     } catch (err) {
+      console.error('JSON Parsing Error:', err);
+      console.error('Failed Response:', aiResponse);
       toast({
         title: "Invalid Response",
-        description: "The AI response is not valid JSON. Please try again.",
+        description: `The AI response is not valid JSON: ${err instanceof Error ? err.message : 'Unknown error'}`,
         variant: "destructive"
       });
     }
