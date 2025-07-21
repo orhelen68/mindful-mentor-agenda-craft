@@ -55,13 +55,19 @@ export function AIGeneratedModules({ onBack }: { onBack?: () => void }) {
   const { toast } = useToast();
 
   const generateSystemPrompt = () => {
-    const prompt = `You are an expert training facilitator and instructional designer with access to a comprehensive database of real-world training materials. Your task is to find and recommend actual, existing interactive training modules that focus on the specified training topic, with durations between 10-60 minutes.
+    const prompt = `You are an expert training facilitator and instructional designer with access to a comprehensive database of real-world training materials. Your task is to find and recommend actual, existing training modules that focus on the specified training topic.
+
+IMPORTANT: Each training module must contain ONE SINGLE TRAINING ACTIVITY only. A training module is defined as:
+- One focused activity (game, reflection, discussion, presentation, or exercise)
+- Duration: 10-60 minutes
+- Can be delivered to large groups, small groups, or individuals
+- Self-contained with clear start and end
 
 For each module, provide REAL examples with:
-- Detailed step-by-step facilitation instructions that a trainer can follow verbatim
+- Detailed step-by-step facilitation instructions for the ONE activity
 - Actual downloadable resources (presentations, handouts, worksheets)
-- Specific activity descriptions with timing, group configurations, and materials needed
-- Real-world examples and case studies to use during delivery
+- Specific activity setup, timing, group configurations, and materials needed
+- Real-world examples and scenarios to use during the single activity
 
 Return results in this structured format:
 
@@ -103,14 +109,19 @@ Focus on modules that are practical, tested in real training environments, and i
   const generateUserPrompt = () => {
     const prompt = `Please find real, existing training modules for the topic: "${trainingTopic}". 
 
-Requirements:
-- Include actual facilitator guides with step-by-step instructions
-- Provide real downloadable materials (slides, handouts, worksheets)
-- Focus on interactive modules with proven track records
-- Include specific examples, scenarios, or case studies for each module
-- Ensure descriptions are detailed enough for a facilitator to run the session immediately
+CRITICAL: Each module must contain only ONE single training activity (not multiple activities).
 
-Return 3-5 high-quality modules with complete facilitation details and real resource links.`;
+Requirements:
+- Each module = ONE activity only (game, reflection, discussion, presentation, or exercise)
+- Duration: 10-60 minutes per module
+- Can be delivered to various group sizes (individual, small group, large group)
+- Include actual facilitator guides with step-by-step instructions for the single activity
+- Provide real downloadable materials (slides, handouts, worksheets)
+- Focus on interactive, standalone modules with proven track records
+- Include specific examples, scenarios, or case studies for the single activity
+- Ensure descriptions are detailed enough for a facilitator to run the one activity immediately
+
+Return 3-5 high-quality modules, each containing ONE focused activity with complete facilitation details and real resource links.`;
     setUserPrompt(prompt);
   };
 
