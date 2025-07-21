@@ -66,7 +66,7 @@ IMPORTANT: Each training module must contain ONE SINGLE TRAINING ACTIVITY only. 
 - Self-contained with clear start and end
 
 For each module, provide REAL examples with:
-- Detailed step-by-step facilitation instructions for the ONE activity
+- Detailed step-by-step facilitation instructions for the ONE activity (place in "facilitator" field)
 - Actual downloadable resources (presentations, handouts, worksheets)
 - Specific activity setup, timing, group configurations, and materials needed
 - Real-world examples and scenarios to use during the single activity
@@ -119,13 +119,13 @@ Requirements:
 - Each module = ONE activity only (game, reflection, discussion, presentation, or exercise)
 - Duration: 10-60 minutes per module
 - Can be delivered to various group sizes (individual, small group, large group)
-- Include actual facilitator guides with step-by-step instructions for the single activity
+- Include detailed step-by-step facilitation instructions in the "facilitator" field
 - Provide real downloadable materials (slides, handouts, worksheets)
 - Focus on interactive, standalone modules with proven track records
 - Include specific examples, scenarios, or case studies for the single activity
-- Ensure descriptions are detailed enough for a facilitator to run the one activity immediately
+- Ensure facilitation instructions in "facilitator" field are detailed enough for a facilitator to run the one activity immediately
 
-Return 3-5 high-quality modules, each containing ONE focused activity with complete facilitation details and real resource links.`;
+Return 3-5 high-quality modules, each containing ONE focused activity with complete facilitation details in the "facilitator" field and real resource links.`;
     setUserPrompt(prompt);
   };
 
