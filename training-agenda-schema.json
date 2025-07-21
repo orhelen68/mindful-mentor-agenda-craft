@@ -19,7 +19,7 @@
           "duration": "number (should match module duration from library)"
         },
         "formality": {
-          "formalityType": "opening|closing",
+          "formalityType": "opening|intro|review|qa|nextsteps|closing",
           "duration": "number (3|5|10|15|20|30 minutes)"
         },
         "sharing": {
@@ -33,7 +33,7 @@
           "duration": "number (20|30 minutes)"
         },
         "break": {
-          "breakType": "tea|lunch|stretch",
+          "breakType": "tea|lunch|stretch|mingling",
           "duration": "number (5|10|15|20|30 minutes)"
         }
       },

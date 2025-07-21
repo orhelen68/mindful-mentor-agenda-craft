@@ -17,7 +17,7 @@ interface Timeslot {
   sequenceNumber: number;
   startTime: string;
   duration: number;
-  activityType: 'module' | 'speaker' | 'discussion' | 'break';
+  activityType: 'module' | 'formality' | 'speaker' | 'discussion' | 'break';
   activityDetails: any;
   notes?: string;
 }
@@ -48,6 +48,7 @@ export function AgendaPreview({
   const getActivityIcon = (activityType: string) => {
     switch (activityType) {
       case 'module': return <BookOpen className="h-4 w-4 text-blue-600" />;
+      case 'formality': return <Clock className="h-4 w-4 text-gray-600" />;
       case 'speaker': return <User className="h-4 w-4 text-green-600" />;
       case 'discussion': return <MessageSquare className="h-4 w-4 text-purple-600" />;
       case 'break': return <Coffee className="h-4 w-4 text-orange-600" />;
@@ -60,6 +61,8 @@ export function AgendaPreview({
     switch (timeslot.activityType) {
       case 'module':
         return details.module?.moduleTitle || 'Module Activity';
+      case 'formality':
+        return details.formality?.formalityType || 'Formality';
       case 'speaker':
         return details.speaker?.topic || 'Speaker Session';
       case 'discussion':
@@ -76,6 +79,8 @@ export function AgendaPreview({
     switch (timeslot.activityType) {
       case 'module':
         return details.module?.facilitator ? `Facilitator: ${details.module.facilitator}` : '';
+      case 'formality':
+        return details.formality?.description || '';
       case 'speaker':
         return details.speaker?.speakerName ? `Speaker: ${details.speaker.speakerName}` : '';
       case 'discussion':

@@ -41,7 +41,7 @@ interface Timeslot {
   sequenceNumber: number;
   startTime: string;
   duration: number;
-  activityType: 'module' | 'speaker' | 'discussion' | 'break';
+  activityType: 'module' | 'formality' | 'speaker' | 'discussion' | 'break';
   activityDetails: any;
   notes?: string;
 }
@@ -84,6 +84,7 @@ function SortableTimeslot({
   const getActivityIcon = () => {
     switch (timeslot.activityType) {
       case 'module': return <BookOpen className="h-4 w-4" />;
+      case 'formality': return <Clock className="h-4 w-4" />;
       case 'speaker': return <User className="h-4 w-4" />;
       case 'discussion': return <MessageSquare className="h-4 w-4" />;
       case 'break': return <Coffee className="h-4 w-4" />;
@@ -96,6 +97,8 @@ function SortableTimeslot({
     switch (timeslot.activityType) {
       case 'module':
         return details.module?.moduleTitle || 'Module Activity';
+      case 'formality':
+        return details.formality?.formalityType || 'Formality';
       case 'speaker':
         return `${details.speaker?.speakerName}: ${details.speaker?.topic}` || 'Speaker Session';
       case 'discussion':
@@ -183,6 +186,46 @@ function TimeslotEditor({
     const details = timeslot.activityDetails[activityType] || {};
 
     switch (activityType) {
+      case 'formality':
+        return (
+          <div className="space-y-3">
+            <div>
+              <Label>Formality Type</Label>
+              <Select
+                value={details.formalityType || ''}
+                onValueChange={(value) => handleActivityDetailsChange('formality', {
+                  ...details,
+                  formalityType: value
+                })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select formality type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="opening">Opening</SelectItem>
+                  <SelectItem value="intro">Intro</SelectItem>
+                  <SelectItem value="review">Review</SelectItem>
+                  <SelectItem value="qa">Q&A</SelectItem>
+                  <SelectItem value="nextsteps">Next Steps</SelectItem>
+                  <SelectItem value="closing">Closing</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Description</Label>
+              <Textarea
+                value={details.description || ''}
+                onChange={(e) => handleActivityDetailsChange('formality', {
+                  ...details,
+                  description: e.target.value
+                })}
+                placeholder="Brief description of this formality"
+                rows={2}
+              />
+            </div>
+          </div>
+        );
+
       case 'module':
         return (
           <div className="space-y-3">
@@ -356,7 +399,7 @@ function TimeslotEditor({
                     <SelectItem value="tea">Tea/Coffee Break</SelectItem>
                     <SelectItem value="lunch">Lunch Break</SelectItem>
                     <SelectItem value="stretch">Stretch Break</SelectItem>
-                    <SelectItem value="long">Long Break</SelectItem>
+                    <SelectItem value="mingling">Mingling Time</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -431,6 +474,7 @@ function TimeslotEditor({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="module">Training Module</SelectItem>
+              <SelectItem value="formality">Formality</SelectItem>
               <SelectItem value="speaker">Speaker/Presentation</SelectItem>
               <SelectItem value="discussion">Discussion</SelectItem>
               <SelectItem value="break">Break</SelectItem>
@@ -571,6 +615,24 @@ export function TimeSlotManager({
               >
                 <BookOpen className="h-4 w-4 mr-2" />
                 Module
+              </Button>
+               <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  const slot: Timeslot = {
+                    sequenceNumber: 0,
+                    startTime: '10:00',
+                    duration: 10,
+                    activityType: 'formality',
+                    activityDetails: { formality: { formalityType: 'opening' } }
+                  };
+                  onAddTimeslot(slot);
+                  setShowAddForm(false);
+                }}
+              >
+                <Clock className="h-4 w-4 mr-2" />
+                Formality
               </Button>
               <Button
                 variant="outline"

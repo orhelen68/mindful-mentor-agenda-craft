@@ -17,7 +17,7 @@ interface Timeslot {
   sequenceNumber: number;
   startTime: string;
   duration: number;
-  activityType: 'module' | 'speaker' | 'discussion' | 'break';
+  activityType: 'module' | 'formality' | 'speaker' | 'discussion' | 'break';
   activityDetails: any;
   notes?: string;
 }
