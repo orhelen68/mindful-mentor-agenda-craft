@@ -6,9 +6,11 @@ const TRAINING_MODULES_BIN_ID = '687df9652d1dfe3c2c75a066';
 
 export interface TrainingRequirement {
   id: string;
-  objective: {
-    mainGoal: string;
-    specificOutcomes: string[];
+  trainingID: string;
+  trainingTitle: string;
+  description: string;
+  targetAudience: {
+    experienceLevel: 'beginner' | 'intermediate' | 'advanced' | 'mixed';
     industryContext: string;
   };
   constraints: {
@@ -16,13 +18,13 @@ export interface TrainingRequirement {
     interactionLevel: 'low' | 'medium' | 'high';
   };
   mindsetFocus: {
-    primaryMindset: string;
-    secondaryMindsets: string[];
+    learningObjectives: string[];
+    primaryTopics: string[];
+    secondaryTopics: string[];
   };
-  targetAudience: {
-    roles: string[];
-    experienceLevel: 'beginner' | 'intermediate' | 'advanced' | 'mixed';
-    teamSize: number;
+  deliveryPreferences: {
+    format: 'in-person' | 'virtual' | 'hybrid';
+    groupSize: number;
   };
   createdAt: string;
   updatedAt: string;

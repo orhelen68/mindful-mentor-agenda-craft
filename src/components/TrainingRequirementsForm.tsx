@@ -7,15 +7,17 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Plus, Trash2 } from 'lucide-react';
-import { jsonBinService, TrainingRequirement } from '@/services/jsonbin';
+import { jsonBinService } from '@/services/jsonbin';
 import { useToast } from '@/hooks/use-toast';
 
 const trainingRequirementsSchema = z.object({
-  objective: z.object({
-    mainGoal: z.string().min(1, 'Main goal is required'),
-    specificOutcomes: z.array(z.string().min(1, 'Outcome cannot be empty')).min(1, 'At least one outcome is required'),
+  trainingID: z.string().min(1, 'Training ID is required'),
+  trainingTitle: z.string().min(1, 'Training title is required'),
+  description: z.string().min(1, 'Description is required'),
+  targetAudience: z.object({
+    experienceLevel: z.enum(['beginner', 'intermediate', 'advanced', 'mixed']),
     industryContext: z.string().min(1, 'Industry context is required'),
   }),
   constraints: z.object({
@@ -23,13 +25,13 @@ const trainingRequirementsSchema = z.object({
     interactionLevel: z.enum(['low', 'medium', 'high']),
   }),
   mindsetFocus: z.object({
-    primaryMindset: z.string().min(1, 'Primary mindset is required'),
-    secondaryMindsets: z.array(z.string()),
+    learningObjectives: z.array(z.string().min(1, 'Objective cannot be empty')).min(1, 'At least one objective is required'),
+    primaryTopics: z.array(z.string().min(1, 'Primary topic cannot be empty')).min(1, 'At least one primary topic is required'),
+    secondaryTopics: z.array(z.string()),
   }),
-  targetAudience: z.object({
-    roles: z.array(z.string().min(1, 'Role cannot be empty')).min(1, 'At least one role is required'),
-    experienceLevel: z.enum(['beginner', 'intermediate', 'advanced', 'mixed']),
-    teamSize: z.number().min(1, 'Team size must be at least 1'),
+  deliveryPreferences: z.object({
+    format: z.enum(['in-person', 'virtual', 'hybrid']),
+    groupSize: z.number().min(1, 'Group size must be at least 1'),
   }),
 });
 
@@ -42,9 +44,11 @@ export function TrainingRequirementsForm({ onSuccess }: { onSuccess?: () => void
   const form = useForm<TrainingRequirementsFormData>({
     resolver: zodResolver(trainingRequirementsSchema),
     defaultValues: {
-      objective: {
-        mainGoal: '',
-        specificOutcomes: [''],
+      trainingID: '',
+      trainingTitle: '',
+      description: '',
+      targetAudience: {
+        experienceLevel: 'intermediate',
         industryContext: '',
       },
       constraints: {
@@ -52,30 +56,30 @@ export function TrainingRequirementsForm({ onSuccess }: { onSuccess?: () => void
         interactionLevel: 'medium',
       },
       mindsetFocus: {
-        primaryMindset: '',
-        secondaryMindsets: [''],
+        learningObjectives: [''],
+        primaryTopics: [''],
+        secondaryTopics: [''],
       },
-      targetAudience: {
-        roles: [''],
-        experienceLevel: 'intermediate',
-        teamSize: 10,
+      deliveryPreferences: {
+        format: 'in-person',
+        groupSize: 10,
       },
     },
   });
 
-  const { fields: outcomeFields, append: appendOutcome, remove: removeOutcome } = useFieldArray({
+  const { fields: objectiveFields, append: appendObjective, remove: removeObjective } = useFieldArray({
     control: form.control,
-    name: 'objective.specificOutcomes',
+    name: 'mindsetFocus.learningObjectives',
   });
 
-  const { fields: mindsetFields, append: appendMindset, remove: removeMindset } = useFieldArray({
+  const { fields: primaryTopicFields, append: appendPrimaryTopic, remove: removePrimaryTopic } = useFieldArray({
     control: form.control,
-    name: 'mindsetFocus.secondaryMindsets',
+    name: 'mindsetFocus.primaryTopics',
   });
 
-  const { fields: roleFields, append: appendRole, remove: removeRole } = useFieldArray({
+  const { fields: secondaryTopicFields, append: appendSecondaryTopic, remove: removeSecondaryTopic } = useFieldArray({
     control: form.control,
-    name: 'targetAudience.roles',
+    name: 'mindsetFocus.secondaryTopics',
   });
 
   const onSubmit = async (data: TrainingRequirementsFormData) => {
@@ -100,276 +104,321 @@ export function TrainingRequirementsForm({ onSuccess }: { onSuccess?: () => void
   };
 
   return (
-    <Card className="max-w-4xl mx-auto">
-      <CardHeader>
-        <CardTitle>Training Requirements</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Objective</h3>
-              
-              <FormField
-                control={form.control}
-                name="objective.mainGoal"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Main Goal</FormLabel>
-                    <FormControl>
-                      <Textarea {...field} placeholder="Describe the main goal of the training..." />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+    <div className="max-w-6xl mx-auto">
+      <div className="mb-8 text-center">
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+          Training Requirements
+        </h1>
+        <p className="text-muted-foreground mt-2">Define your training objectives and constraints</p>
+      </div>
+      
+      <Card className="shadow-lg border-0 bg-gradient-to-br from-background to-muted/20">
+        <CardContent className="p-8">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+              <div className="grid md:grid-cols-2 gap-8">
+                <div className="space-y-6">
+                  <FormField
+                    control={form.control}
+                    name="trainingID"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-base font-semibold">Training ID</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="e.g., T001" className="h-11" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-              <FormField
-                control={form.control}
-                name="objective.industryContext"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Industry Context</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="e.g., Technology and startup companies" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                  <FormField
+                    control={form.control}
+                    name="trainingTitle"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-base font-semibold">Training Title</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="e.g., Leadership Mindset for New Managers" className="h-11" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-              <div>
-                <FormLabel>Specific Outcomes</FormLabel>
-                {outcomeFields.map((field, index) => (
-                  <div key={field.id} className="flex gap-2 mt-2">
+                  <FormField
+                    control={form.control}
+                    name="description"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-base font-semibold">Description</FormLabel>
+                        <FormControl>
+                          <Textarea {...field} placeholder="Describe the training program..." className="min-h-[100px]" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="targetAudience.industryContext"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-base font-semibold">Industry Context</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="e.g., Technology and startup companies" className="h-11" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="space-y-6">
+                  <FormField
+                    control={form.control}
+                    name="constraints.duration"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-base font-semibold">Duration (minutes)</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="number" 
+                            {...field} 
+                            onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                            className="h-11"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="constraints.interactionLevel"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-base font-semibold">Interaction Level</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger className="h-11">
+                              <SelectValue placeholder="Select interaction level" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="low">Low</SelectItem>
+                            <SelectItem value="medium">Medium</SelectItem>
+                            <SelectItem value="high">High</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="targetAudience.experienceLevel"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-base font-semibold">Experience Level</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger className="h-11">
+                              <SelectValue placeholder="Select experience level" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="beginner">Beginner</SelectItem>
+                            <SelectItem value="intermediate">Intermediate</SelectItem>
+                            <SelectItem value="advanced">Advanced</SelectItem>
+                            <SelectItem value="mixed">Mixed</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <div className="grid grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
-                      name={`objective.specificOutcomes.${index}`}
+                      name="deliveryPreferences.format"
                       render={({ field }) => (
-                        <FormItem className="flex-1">
+                        <FormItem>
+                          <FormLabel className="text-base font-semibold">Format</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger className="h-11">
+                                <SelectValue placeholder="Format" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="in-person">In-Person</SelectItem>
+                              <SelectItem value="virtual">Virtual</SelectItem>
+                              <SelectItem value="hybrid">Hybrid</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="deliveryPreferences.groupSize"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-base font-semibold">Group Size</FormLabel>
                           <FormControl>
-                            <Input {...field} placeholder="Enter specific outcome..." />
+                            <Input 
+                              type="number" 
+                              {...field} 
+                              onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                              className="h-11"
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                <div>
+                  <FormLabel className="text-lg font-semibold">Learning Objectives</FormLabel>
+                  <div className="mt-3 space-y-3">
+                    {objectiveFields.map((field, index) => (
+                      <div key={field.id} className="flex gap-3">
+                        <FormField
+                          control={form.control}
+                          name={`mindsetFocus.learningObjectives.${index}`}
+                          render={({ field }) => (
+                            <FormItem className="flex-1">
+                              <FormControl>
+                                <Input {...field} placeholder="Enter learning objective..." className="h-11" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          onClick={() => removeObjective(index)}
+                          disabled={objectiveFields.length === 1}
+                          className="h-11 w-11"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
                     <Button
                       type="button"
                       variant="outline"
-                      size="icon"
-                      onClick={() => removeOutcome(index)}
-                      disabled={outcomeFields.length === 1}
+                      onClick={() => appendObjective('')}
+                      className="w-full"
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Learning Objective
                     </Button>
                   </div>
-                ))}
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => appendOutcome('')}
-                  className="mt-2"
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Outcome
-                </Button>
-              </div>
-            </div>
+                </div>
 
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Constraints</h3>
-              
-              <FormField
-                control={form.control}
-                name="constraints.duration"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Duration (minutes)</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="number" 
-                        {...field} 
-                        onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="constraints.interactionLevel"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Interaction Level</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select interaction level" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="low">Low</SelectItem>
-                        <SelectItem value="medium">Medium</SelectItem>
-                        <SelectItem value="high">High</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Mindset Focus</h3>
-              
-              <FormField
-                control={form.control}
-                name="mindsetFocus.primaryMindset"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Primary Mindset</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="e.g., Growth mindset and adaptability" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div>
-                <FormLabel>Secondary Mindsets</FormLabel>
-                {mindsetFields.map((field, index) => (
-                  <div key={field.id} className="flex gap-2 mt-2">
-                    <FormField
-                      control={form.control}
-                      name={`mindsetFocus.secondaryMindsets.${index}`}
-                      render={({ field }) => (
-                        <FormItem className="flex-1">
-                          <FormControl>
-                            <Input {...field} placeholder="Enter secondary mindset..." />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                <div>
+                  <FormLabel className="text-lg font-semibold">Primary Topics</FormLabel>
+                  <div className="mt-3 space-y-3">
+                    {primaryTopicFields.map((field, index) => (
+                      <div key={field.id} className="flex gap-3">
+                        <FormField
+                          control={form.control}
+                          name={`mindsetFocus.primaryTopics.${index}`}
+                          render={({ field }) => (
+                            <FormItem className="flex-1">
+                              <FormControl>
+                                <Input {...field} placeholder="Enter primary topic..." className="h-11" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          onClick={() => removePrimaryTopic(index)}
+                          disabled={primaryTopicFields.length === 1}
+                          className="h-11 w-11"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
                     <Button
                       type="button"
                       variant="outline"
-                      size="icon"
-                      onClick={() => removeMindset(index)}
+                      onClick={() => appendPrimaryTopic('')}
+                      className="w-full"
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Primary Topic
                     </Button>
                   </div>
-                ))}
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => appendMindset('')}
-                  className="mt-2"
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Mindset
-                </Button>
-              </div>
-            </div>
+                </div>
 
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Target Audience</h3>
-              
-              <div>
-                <FormLabel>Roles</FormLabel>
-                {roleFields.map((field, index) => (
-                  <div key={field.id} className="flex gap-2 mt-2">
-                    <FormField
-                      control={form.control}
-                      name={`targetAudience.roles.${index}`}
-                      render={({ field }) => (
-                        <FormItem className="flex-1">
-                          <FormControl>
-                            <Input {...field} placeholder="Enter role..." />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                <div>
+                  <FormLabel className="text-lg font-semibold">Secondary Topics</FormLabel>
+                  <div className="mt-3 space-y-3">
+                    {secondaryTopicFields.map((field, index) => (
+                      <div key={field.id} className="flex gap-3">
+                        <FormField
+                          control={form.control}
+                          name={`mindsetFocus.secondaryTopics.${index}`}
+                          render={({ field }) => (
+                            <FormItem className="flex-1">
+                              <FormControl>
+                                <Input {...field} placeholder="Enter secondary topic..." className="h-11" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          onClick={() => removeSecondaryTopic(index)}
+                          className="h-11 w-11"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
                     <Button
                       type="button"
                       variant="outline"
-                      size="icon"
-                      onClick={() => removeRole(index)}
-                      disabled={roleFields.length === 1}
+                      onClick={() => appendSecondaryTopic('')}
+                      className="w-full"
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Secondary Topic
                     </Button>
                   </div>
-                ))}
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => appendRole('')}
-                  className="mt-2"
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Role
-                </Button>
+                </div>
               </div>
 
-              <FormField
-                control={form.control}
-                name="targetAudience.experienceLevel"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Experience Level</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select experience level" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="beginner">Beginner</SelectItem>
-                        <SelectItem value="intermediate">Intermediate</SelectItem>
-                        <SelectItem value="advanced">Advanced</SelectItem>
-                        <SelectItem value="mixed">Mixed</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="targetAudience.teamSize"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Team Size</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="number" 
-                        {...field} 
-                        onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <Button type="submit" disabled={isSubmitting} className="w-full">
-              {isSubmitting ? 'Saving...' : 'Save Training Requirements'}
-            </Button>
-          </form>
-        </Form>
-      </CardContent>
-    </Card>
+              <Button type="submit" disabled={isSubmitting} className="w-full h-12 text-lg">
+                {isSubmitting ? 'Saving...' : 'Save Training Requirements'}
+              </Button>
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

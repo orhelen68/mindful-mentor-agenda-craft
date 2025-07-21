@@ -96,7 +96,7 @@ export function TrainingRequirementsManagement() {
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
-                    <CardTitle className="text-lg mb-2">{requirement.objective.mainGoal}</CardTitle>
+                    <CardTitle className="text-lg mb-2">{requirement.trainingTitle}</CardTitle>
                     <div className="flex gap-2 mb-2">
                       <Badge variant="secondary">
                         <Clock className="w-3 h-3 mr-1" />
@@ -104,14 +104,14 @@ export function TrainingRequirementsManagement() {
                       </Badge>
                       <Badge variant="outline">
                         <Users className="w-3 h-3 mr-1" />
-                        {requirement.targetAudience.teamSize} people
+                        {requirement.deliveryPreferences.groupSize} people
                       </Badge>
                       <Badge variant="outline">
                         {requirement.constraints.interactionLevel} interaction
                       </Badge>
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      {requirement.objective.industryContext}
+                      {requirement.targetAudience.industryContext}
                     </p>
                   </div>
                   <div className="flex gap-2">
@@ -133,17 +133,41 @@ export function TrainingRequirementsManagement() {
                         {selectedRequirement && (
                           <div className="space-y-6">
                             <div>
-                              <h3 className="font-semibold mb-2">Objective</h3>
-                              <p className="mb-3">{selectedRequirement.objective.mainGoal}</p>
+                              <h3 className="font-semibold mb-2">Training Information</h3>
+                              <p className="text-sm mb-1"><strong>ID:</strong> {selectedRequirement.trainingID}</p>
+                              <p className="text-sm mb-1"><strong>Title:</strong> {selectedRequirement.trainingTitle}</p>
+                              <p className="text-sm mb-3"><strong>Description:</strong> {selectedRequirement.description}</p>
+                            </div>
+
+                            <div>
+                              <h3 className="font-semibold mb-2">Learning Objectives</h3>
+                              <ul className="list-disc list-inside space-y-1">
+                                {selectedRequirement.mindsetFocus.learningObjectives.map((objective, index) => (
+                                  <li key={index} className="text-sm">{objective}</li>
+                                ))}
+                              </ul>
+                            </div>
+
+                            <div>
+                              <h3 className="font-semibold mb-2">Topics</h3>
                               <div className="mb-3">
-                                <h4 className="font-medium mb-1">Specific Outcomes:</h4>
+                                <h4 className="font-medium mb-1">Primary Topics:</h4>
                                 <ul className="list-disc list-inside space-y-1">
-                                  {selectedRequirement.objective.specificOutcomes.map((outcome, index) => (
-                                    <li key={index} className="text-sm">{outcome}</li>
+                                  {selectedRequirement.mindsetFocus.primaryTopics.map((topic, index) => (
+                                    <li key={index} className="text-sm">{topic}</li>
                                   ))}
                                 </ul>
                               </div>
-                              <p className="text-sm"><strong>Industry Context:</strong> {selectedRequirement.objective.industryContext}</p>
+                              {selectedRequirement.mindsetFocus.secondaryTopics.length > 0 && (
+                                <div>
+                                  <h4 className="font-medium mb-1">Secondary Topics:</h4>
+                                  <ul className="list-disc list-inside space-y-1">
+                                    {selectedRequirement.mindsetFocus.secondaryTopics.map((topic, index) => (
+                                      <li key={index} className="text-sm">{topic}</li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
                             </div>
 
                             <div>
@@ -153,32 +177,15 @@ export function TrainingRequirementsManagement() {
                             </div>
 
                             <div>
-                              <h3 className="font-semibold mb-2">Mindset Focus</h3>
-                              <p className="text-sm mb-2"><strong>Primary:</strong> {selectedRequirement.mindsetFocus.primaryMindset}</p>
-                              {selectedRequirement.mindsetFocus.secondaryMindsets.length > 0 && (
-                                <div>
-                                  <h4 className="font-medium mb-1">Secondary Mindsets:</h4>
-                                  <ul className="list-disc list-inside space-y-1">
-                                    {selectedRequirement.mindsetFocus.secondaryMindsets.map((mindset, index) => (
-                                      <li key={index} className="text-sm">{mindset}</li>
-                                    ))}
-                                  </ul>
-                                </div>
-                              )}
+                              <h3 className="font-semibold mb-2">Target Audience</h3>
+                              <p className="text-sm mb-1"><strong>Experience Level:</strong> {selectedRequirement.targetAudience.experienceLevel}</p>
+                              <p className="text-sm mb-1"><strong>Industry Context:</strong> {selectedRequirement.targetAudience.industryContext}</p>
                             </div>
 
                             <div>
-                              <h3 className="font-semibold mb-2">Target Audience</h3>
-                              <div className="mb-2">
-                                <h4 className="font-medium mb-1">Roles:</h4>
-                                <ul className="list-disc list-inside space-y-1">
-                                  {selectedRequirement.targetAudience.roles.map((role, index) => (
-                                    <li key={index} className="text-sm">{role}</li>
-                                  ))}
-                                </ul>
-                              </div>
-                              <p className="text-sm mb-1"><strong>Experience Level:</strong> {selectedRequirement.targetAudience.experienceLevel}</p>
-                              <p className="text-sm"><strong>Team Size:</strong> {selectedRequirement.targetAudience.teamSize}</p>
+                              <h3 className="font-semibold mb-2">Delivery Preferences</h3>
+                              <p className="text-sm mb-1"><strong>Format:</strong> {selectedRequirement.deliveryPreferences.format}</p>
+                              <p className="text-sm"><strong>Group Size:</strong> {selectedRequirement.deliveryPreferences.groupSize}</p>
                             </div>
 
                             <div className="text-xs text-muted-foreground">

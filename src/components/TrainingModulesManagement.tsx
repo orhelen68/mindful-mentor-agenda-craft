@@ -21,15 +21,15 @@ const activitySchema = z.object({
   duration: z.number().min(1, 'Duration must be at least 1 minute'),
 });
 
-  const trainingModuleSchema = z.object({
-    title: z.string().min(1, 'Title is required'),
-    description: z.string().min(1, 'Description is required'),
-    objectives: z.array(z.string().min(1, 'Objective cannot be empty')).min(1, 'At least one objective is required'),
-    duration: z.number().min(1, 'Duration must be at least 1 minute'),
-    materials: z.array(z.string().min(1, 'Material cannot be empty')),
-    activities: z.array(activitySchema),
-    tags: z.array(z.string().min(1, 'Tag cannot be empty')),
-  });
+const trainingModuleSchema = z.object({
+  title: z.string().min(1, 'Title is required'),
+  description: z.string().min(1, 'Description is required'),
+  objectives: z.array(z.string().min(1, 'Objective cannot be empty')).min(1, 'At least one objective is required'),
+  duration: z.number().min(1, 'Duration must be at least 1 minute'),
+  materials: z.array(z.string().min(1, 'Material cannot be empty')),
+  activities: z.array(activitySchema),
+  tags: z.array(z.string().min(1, 'Tag cannot be empty')),
+});
 
 type TrainingModuleFormData = z.infer<typeof trainingModuleSchema>;
 
@@ -498,14 +498,14 @@ export function TrainingModulesManagement() {
                       </Badge>
                       <Badge variant="outline">
                         <BookOpen className="w-3 h-3 mr-1" />
-                        {module.activities.length} activities
+                        {module.activities?.length || 0} activities
                       </Badge>
                     </div>
                     <p className="text-sm text-muted-foreground mb-2">
                       {module.description}
                     </p>
                     <div className="flex gap-1 flex-wrap">
-                      {module.tags.map((tag, index) => (
+                      {module.tags?.map((tag, index) => (
                         <Badge key={index} variant="outline" className="text-xs">
                           {tag}
                         </Badge>
@@ -537,53 +537,61 @@ export function TrainingModulesManagement() {
                               <p className="mb-2"><strong>Duration:</strong> {formatDuration(selectedModule.duration)}</p>
                             </div>
 
-                            <div>
-                              <h3 className="font-semibold mb-2">Objectives</h3>
-                              <ul className="list-disc list-inside space-y-1">
-                                {selectedModule.objectives.map((objective, index) => (
-                                  <li key={index} className="text-sm">{objective}</li>
-                                ))}
-                              </ul>
-                            </div>
+                            {selectedModule.objectives?.length > 0 && (
+                              <div>
+                                <h3 className="font-semibold mb-2">Objectives</h3>
+                                <ul className="list-disc list-inside space-y-1">
+                                  {selectedModule.objectives.map((objective, index) => (
+                                    <li key={index} className="text-sm">{objective}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
 
-                            <div>
-                              <h3 className="font-semibold mb-2">Materials</h3>
-                              <ul className="list-disc list-inside space-y-1">
-                                {selectedModule.materials.map((material, index) => (
-                                  <li key={index} className="text-sm">{material}</li>
-                                ))}
-                              </ul>
-                            </div>
+                            {selectedModule.materials?.length > 0 && (
+                              <div>
+                                <h3 className="font-semibold mb-2">Materials</h3>
+                                <ul className="list-disc list-inside space-y-1">
+                                  {selectedModule.materials.map((material, index) => (
+                                    <li key={index} className="text-sm">{material}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
 
-                            <div>
-                              <h3 className="font-semibold mb-2">Activities</h3>
-                              <div className="space-y-3">
-                                {selectedModule.activities.map((activity, index) => (
-                                  <div key={index} className="border p-3 rounded">
-                                    <div className="flex gap-2 mb-2">
-                                      <Badge variant="outline">
-                                        {activity.type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                                      </Badge>
-                                      <Badge variant="secondary">
-                                        {formatDuration(activity.duration)}
-                                      </Badge>
+                            {selectedModule.activities?.length > 0 && (
+                              <div>
+                                <h3 className="font-semibold mb-2">Activities</h3>
+                                <div className="space-y-3">
+                                  {selectedModule.activities.map((activity, index) => (
+                                    <div key={index} className="border p-3 rounded">
+                                      <div className="flex gap-2 mb-2">
+                                        <Badge variant="outline">
+                                          {activity.type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                                        </Badge>
+                                        <Badge variant="secondary">
+                                          {formatDuration(activity.duration)}
+                                        </Badge>
+                                      </div>
+                                      <p className="text-sm">{activity.description}</p>
                                     </div>
-                                    <p className="text-sm">{activity.description}</p>
-                                  </div>
-                                ))}
+                                  ))}
+                                </div>
                               </div>
-                            </div>
+                            )}
 
-                            <div>
-                              <h3 className="font-semibold mb-2">Tags</h3>
-                              <div className="flex gap-1 flex-wrap">
-                                {selectedModule.tags.map((tag, index) => (
-                                  <Badge key={index} variant="outline">
-                                    {tag}
-                                  </Badge>
-                                ))}
+                            {selectedModule.tags?.length > 0 && (
+                              <div>
+                                <h3 className="font-semibold mb-2">Tags</h3>
+                                <div className="flex gap-1 flex-wrap">
+                                  {selectedModule.tags.map((tag, index) => (
+                                    <Badge key={index} variant="outline">
+                                      {tag}
+                                    </Badge>
+                                  ))}
+                                </div>
                               </div>
-                            </div>
+                            )}
 
                             <div className="text-xs text-muted-foreground">
                               <p><strong>Created:</strong> {new Date(selectedModule.createdAt).toLocaleString()}</p>
