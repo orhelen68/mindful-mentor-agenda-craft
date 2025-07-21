@@ -47,12 +47,15 @@ type TrainingModuleFormData = z.infer<typeof trainingModuleSchema>;
 
 export function TrainingModulesManagement() {
   const [modules, setModules] = useState<TrainingModule[]>([]);
+  const [filteredModules, setFilteredModules] = useState<TrainingModule[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedModule, setSelectedModule] = useState<TrainingModule | null>(null);
   const [deleteLoading, setDeleteLoading] = useState<string | null>(null);
   const [editingModule, setEditingModule] = useState<TrainingModule | null>(null);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showAIGenerator, setShowAIGenerator] = useState(false);
+  const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [searchTags, setSearchTags] = useState<string>('');
   const { toast } = useToast();
 
   const form = useForm<TrainingModuleFormData>({
@@ -100,6 +103,7 @@ export function TrainingModulesManagement() {
     try {
       const data = await trainingModulesService.getTrainingModules();
       setModules(data);
+      setFilteredModules(data);
     } catch (error) {
       console.error('Error loading modules:', error);
       toast({
@@ -111,6 +115,33 @@ export function TrainingModulesManagement() {
       setLoading(false);
     }
   };
+
+  // Filter modules when filters change
+  useEffect(() => {
+    let filtered = modules;
+
+    // Filter by category
+    if (categoryFilter && categoryFilter !== 'all') {
+      filtered = filtered.filter(module => 
+        module.category.toLowerCase().includes(categoryFilter.toLowerCase())
+      );
+    }
+
+    // Filter by tags
+    if (searchTags.trim()) {
+      const searchTerms = searchTags.toLowerCase().split(' ');
+      filtered = filtered.filter(module => {
+        const moduleTags = module.tags?.map(tag => tag.toLowerCase()) || [];
+        return searchTerms.some(term => 
+          moduleTags.some(tag => tag.includes(term)) ||
+          module.module_title.toLowerCase().includes(term) ||
+          module.description.toLowerCase().includes(term)
+        );
+      });
+    }
+
+    setFilteredModules(filtered);
+  }, [modules, categoryFilter, searchTags]);
 
   useEffect(() => {
     loadModules();
@@ -612,6 +643,50 @@ export function TrainingModulesManagement() {
           </div>
         </div>
 
+        {/* Filters */}
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex-1">
+                <label className="text-sm font-medium mb-2 block">Filter by Category</label>
+                <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="All categories" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Categories</SelectItem>
+                    {Array.from(new Set(modules.map(m => m.category))).map(category => (
+                      <SelectItem key={category} value={category}>{category}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex-1">
+                <label className="text-sm font-medium mb-2 block">Search by Tags or Keywords</label>
+                <Input
+                  value={searchTags}
+                  onChange={(e) => setSearchTags(e.target.value)}
+                  placeholder="Enter tags or keywords to search..."
+                />
+              </div>
+              <div className="flex items-end">
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    setCategoryFilter('all');
+                    setSearchTags('');
+                  }}
+                >
+                  Clear Filters
+                </Button>
+              </div>
+            </div>
+            <div className="mt-4 text-sm text-muted-foreground">
+              Showing {filteredModules.length} of {modules.length} modules
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Edit Dialog */}
         <Dialog open={!!editingModule} onOpenChange={(open) => !open && setEditingModule(null)}>
           <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
@@ -712,7 +787,7 @@ export function TrainingModulesManagement() {
 
         {/* Modules Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {modules.map((module) => (
+          {filteredModules.map((module) => (
             <Card key={module.id} className="hover:shadow-lg transition-shadow">
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
@@ -798,7 +873,7 @@ export function TrainingModulesManagement() {
           ))}
         </div>
 
-        {modules.length === 0 && !loading && (
+        {filteredModules.length === 0 && !loading && (
           <div className="text-center py-12">
             <BookOpen className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
             <h3 className="text-lg font-semibold mb-2">No training modules found</h3>
