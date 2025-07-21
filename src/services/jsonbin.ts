@@ -1,8 +1,15 @@
 const JSONBIN_BASE_URL = 'https://api.jsonbin.io/v3';
-const MASTER_KEY = '$2a$10$APsAMK9yLPqFiHvrQNKQFOn0hk5QPCpPsZxGaU8us20ul28TMFMyO';
 
-const TRAINING_REQUIREMENTS_BIN_ID = '687df942d1981e22d1898301';
-const TRAINING_MODULES_BIN_ID = '687df9652d1dfe3c2c75a066';
+// Helper functions to get credentials from localStorage
+export const getRequirementsCredentials = () => {
+  const stored = localStorage.getItem('jsonbin_requirements_credentials');
+  return stored ? JSON.parse(stored) : null;
+};
+
+export const getModulesCredentials = () => {
+  const stored = localStorage.getItem('jsonbin_modules_credentials');
+  return stored ? JSON.parse(stored) : null;
+};
 
 export interface TrainingRequirement {
   id: string;
@@ -48,34 +55,33 @@ export interface TrainingModule {
 }
 
 class JSONBinService {
-  private headers = {
-    'Content-Type': 'application/json',
-    'X-Master-Key': MASTER_KEY,
-    'X-Bin-Meta': 'false',
-  };
+  private getHeaders(masterKey: string) {
+    return {
+      'Content-Type': 'application/json',
+      'X-Master-Key': masterKey,
+      'X-Bin-Meta': 'false',
+    };
+  }
 
   async getTrainingRequirements(): Promise<TrainingRequirement[]> {
+    const credentials = getRequirementsCredentials();
+    if (!credentials) {
+      throw new Error('No credentials found for training requirements. Please configure JSONBin credentials.');
+    }
+
     try {
-      console.log('Fetching training requirements from:', `${JSONBIN_BASE_URL}/b/${TRAINING_REQUIREMENTS_BIN_ID}/latest`);
-      console.log('Headers:', this.headers);
+      console.log('Fetching training requirements from:', `${JSONBIN_BASE_URL}/b/${credentials.binId}/latest`);
       
-      // Try different fetch configurations
-      const fetchOptions = {
+      const headers = this.getHeaders(credentials.masterKey);
+      console.log('Headers:', headers);
+      
+      const response = await fetch(`${JSONBIN_BASE_URL}/b/${credentials.binId}/latest`, {
         method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Master-Key': MASTER_KEY,
-          'X-Bin-Meta': 'false',
-        },
-      };
-      
-      console.log('Fetch options:', fetchOptions);
-      
-      const response = await fetch(`${JSONBIN_BASE_URL}/b/${TRAINING_REQUIREMENTS_BIN_ID}/latest`, fetchOptions);
+        headers,
+      });
       
       console.log('Response received:', response);
       console.log('Response status:', response.status);
-      console.log('Response headers:', [...response.headers.entries()]);
       
       if (!response.ok) {
         console.error('Response not OK:', response.status, response.statusText);
@@ -87,52 +93,24 @@ class JSONBinService {
       const data = await response.json();
       console.log('Fetched data structure:', data);
       console.log('Data.record:', data.record);
-      console.log('Is data.record an array?', Array.isArray(data.record));
       
       return Array.isArray(data.record) ? data.record : (data.record ? [data.record] : []);
     } catch (error) {
       console.error('Detailed error fetching training requirements:', error);
-      console.error('Error name:', error.name);
-      console.error('Error message:', error.message);
-      console.error('Error stack:', error.stack);
-      
-      // Return sample data for testing
-      console.log('Returning sample data for testing purposes');
-      return [
-        {
-          id: 'sample_1',
-          trainingID: 'TRN001',
-          trainingTitle: 'Sample Training - Connection Test',
-          description: 'This is sample data while we debug the JSONbin connection',
-          targetAudience: {
-            experienceLevel: 'intermediate' as const,
-            industryContext: 'Technology'
-          },
-          constraints: {
-            duration: 120,
-            interactionLevel: 'high' as const
-          },
-          mindsetFocus: {
-            learningObjectives: ['Test objective 1', 'Test objective 2'],
-            primaryTopics: ['Leadership', 'Communication'],
-            secondaryTopics: ['Teamwork']
-          },
-          deliveryPreferences: {
-            format: 'in-person' as const,
-            groupSize: 20
-          },
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        }
-      ];
+      throw error;
     }
   }
 
   async updateTrainingRequirements(requirements: TrainingRequirement[]): Promise<void> {
+    const credentials = getRequirementsCredentials();
+    if (!credentials) {
+      throw new Error('No credentials found for training requirements. Please configure JSONBin credentials.');
+    }
+
     try {
-      const response = await fetch(`${JSONBIN_BASE_URL}/b/${TRAINING_REQUIREMENTS_BIN_ID}`, {
+      const response = await fetch(`${JSONBIN_BASE_URL}/b/${credentials.binId}`, {
         method: 'PUT',
-        headers: this.headers,
+        headers: this.getHeaders(credentials.masterKey),
         body: JSON.stringify(requirements),
       });
       
@@ -165,26 +143,24 @@ class JSONBinService {
   }
 
   async getTrainingModules(): Promise<TrainingModule[]> {
+    const credentials = getModulesCredentials();
+    if (!credentials) {
+      throw new Error('No credentials found for training modules. Please configure JSONBin credentials.');
+    }
+
     try {
-      console.log('Fetching training modules from:', `${JSONBIN_BASE_URL}/b/${TRAINING_MODULES_BIN_ID}/latest`);
-      console.log('Headers:', this.headers);
+      console.log('Fetching training modules from:', `${JSONBIN_BASE_URL}/b/${credentials.binId}/latest`);
       
-      const fetchOptions = {
+      const headers = this.getHeaders(credentials.masterKey);
+      console.log('Headers:', headers);
+      
+      const response = await fetch(`${JSONBIN_BASE_URL}/b/${credentials.binId}/latest`, {
         method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Master-Key': MASTER_KEY,
-          'X-Bin-Meta': 'false',
-        },
-      };
-      
-      console.log('Fetch options:', fetchOptions);
-      
-      const response = await fetch(`${JSONBIN_BASE_URL}/b/${TRAINING_MODULES_BIN_ID}/latest`, fetchOptions);
+        headers,
+      });
       
       console.log('Response received:', response);
       console.log('Response status:', response.status);
-      console.log('Response headers:', [...response.headers.entries()]);
       
       if (!response.ok) {
         console.error('Response not OK:', response.status, response.statusText);
@@ -196,45 +172,24 @@ class JSONBinService {
       const data = await response.json();
       console.log('Fetched modules data structure:', data);
       console.log('Modules data.record:', data.record);
-      console.log('Is modules data.record an array?', Array.isArray(data.record));
       
       return Array.isArray(data.record) ? data.record : (data.record ? [data.record] : []);
     } catch (error) {
       console.error('Detailed error fetching training modules:', error);
-      console.error('Error name:', error.name);
-      console.error('Error message:', error.message);
-      console.error('Error stack:', error.stack);
-      
-      // Return sample data for testing
-      console.log('Returning sample modules data for testing purposes');
-      return [
-        {
-          id: 'sample_mod_1',
-          title: 'Sample Module - Connection Test',
-          description: 'This is sample module data while we debug the JSONbin connection',
-          objectives: ['Test objective 1', 'Test objective 2'],
-          duration: 60,
-          materials: ['Sample material 1', 'Sample material 2'],
-          activities: [
-            {
-              type: 'discussion' as const,
-              description: 'Sample discussion activity',
-              duration: 30
-            }
-          ],
-          tags: ['sample', 'test'],
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        }
-      ];
+      throw error;
     }
   }
 
   async updateTrainingModules(modules: TrainingModule[]): Promise<void> {
+    const credentials = getModulesCredentials();
+    if (!credentials) {
+      throw new Error('No credentials found for training modules. Please configure JSONBin credentials.');
+    }
+
     try {
-      const response = await fetch(`${JSONBIN_BASE_URL}/b/${TRAINING_MODULES_BIN_ID}`, {
+      const response = await fetch(`${JSONBIN_BASE_URL}/b/${credentials.binId}`, {
         method: 'PUT',
-        headers: this.headers,
+        headers: this.getHeaders(credentials.masterKey),
         body: JSON.stringify(modules),
       });
       

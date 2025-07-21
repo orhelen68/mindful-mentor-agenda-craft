@@ -7,14 +7,15 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Trash2, Eye, Edit, Plus, Clock, BookOpen, Brain } from 'lucide-react';
-import { jsonBinService, TrainingModule } from '@/services/jsonbin';
+import { Trash2, Eye, Edit, Plus, Clock, BookOpen, Brain, Settings } from 'lucide-react';
+import { jsonBinService, TrainingModule, getModulesCredentials } from '@/services/jsonbin';
 import { useToast } from '@/hooks/use-toast';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { AIGeneratedModules } from './AIGeneratedModules';
+import { JSONBinCredentialsDialog, JSONBinCredentials } from './JSONBinCredentialsDialog';
 
 const activitySchema = z.object({
   type: z.enum(['lecture', 'discussion', 'exercise', 'case_study', 'role_play']),
@@ -36,12 +37,13 @@ type TrainingModuleFormData = z.infer<typeof trainingModuleSchema>;
 
 export function TrainingModulesManagement() {
   const [modules, setModules] = useState<TrainingModule[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [selectedModule, setSelectedModule] = useState<TrainingModule | null>(null);
   const [deleteLoading, setDeleteLoading] = useState<string | null>(null);
   const [editingModule, setEditingModule] = useState<TrainingModule | null>(null);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showAIGenerator, setShowAIGenerator] = useState(false);
+  const [showCredentialsDialog, setShowCredentialsDialog] = useState(false);
   const { toast } = useToast();
 
   const form = useForm<TrainingModuleFormData>({
@@ -78,19 +80,35 @@ export function TrainingModulesManagement() {
   });
 
   const loadModules = async () => {
+    // Check if credentials exist
+    const credentials = getModulesCredentials();
+    if (!credentials) {
+      setShowCredentialsDialog(true);
+      return;
+    }
+
+    setLoading(true);
     try {
       const data = await jsonBinService.getTrainingModules();
       setModules(data);
     } catch (error) {
       console.error('Error loading modules:', error);
       toast({
-        title: 'Error',
-        description: 'Failed to load training modules. Please check your internet connection.',
-        variant: 'destructive',
+        title: "Error",
+        description: "Failed to load training modules. Please check your credentials.",
+        variant: "destructive",
       });
+      // Show credentials dialog if there's an error
+      setShowCredentialsDialog(true);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleCredentialsSet = (credentials: JSONBinCredentials) => {
+    // Credentials are already saved in localStorage by the dialog
+    // Now try to load the modules
+    loadModules();
   };
 
   useEffect(() => {
@@ -463,36 +481,52 @@ export function TrainingModulesManagement() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Training Modules Management</h2>
-        <div className="flex gap-2">
-          <Button
-            onClick={() => setShowAIGenerator(!showAIGenerator)}
-            variant={showAIGenerator ? "default" : "outline"}
-          >
-            <Brain className="w-4 h-4 mr-2" />
-            AI Generated Modules
-          </Button>
-          <Button onClick={loadModules} variant="outline">
-            Refresh
-          </Button>
-          <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="w-4 h-4 mr-2" />
-                Add Module
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>Add Training Module</DialogTitle>
-              </DialogHeader>
-              <ModuleForm onSubmit={handleAdd} />
-            </DialogContent>
-          </Dialog>
+    <>
+      <JSONBinCredentialsDialog
+        open={showCredentialsDialog}
+        onOpenChange={setShowCredentialsDialog}
+        onCredentialsSet={handleCredentialsSet}
+        type="modules"
+      />
+      
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <h2 className="text-2xl font-bold">Training Modules Management</h2>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowCredentialsDialog(true)}
+              className="flex items-center gap-2"
+            >
+              <Settings className="h-4 w-4" />
+              Configure JSONBin
+            </Button>
+            <Button
+              onClick={() => setShowAIGenerator(!showAIGenerator)}
+              variant={showAIGenerator ? "default" : "outline"}
+            >
+              <Brain className="w-4 h-4 mr-2" />
+              AI Generated Modules
+            </Button>
+            <Button onClick={loadModules} variant="outline">
+              Refresh
+            </Button>
+            <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+              <DialogTrigger asChild>
+                <Button>
+                  <Plus className="w-4 w-4 mr-2" />
+                  Add Module
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>Add Training Module</DialogTitle>
+                </DialogHeader>
+                <ModuleForm onSubmit={handleAdd} />
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
-      </div>
 
       {/* Edit Dialog */}
       <Dialog open={!!editingModule} onOpenChange={(open) => !open && setEditingModule(null)}>
@@ -680,6 +714,7 @@ export function TrainingModulesManagement() {
           </Button>
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 }
