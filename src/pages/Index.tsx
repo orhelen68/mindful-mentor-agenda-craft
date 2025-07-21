@@ -29,11 +29,11 @@ const Index = () => {
             </TabsTrigger>
             <TabsTrigger value="requirements-management" className="flex items-center gap-2">
               <Settings className="w-4 h-4" />
-              Manage Requirements
+              Propose Training Agenda
             </TabsTrigger>
             <TabsTrigger value="modules-management" className="flex items-center gap-2">
               <BookOpen className="w-4 h-4" />
-              Manage Modules
+              Training Module Library
             </TabsTrigger>
           </TabsList>
 
