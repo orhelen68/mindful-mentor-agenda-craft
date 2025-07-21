@@ -330,15 +330,27 @@ The response must be valid JSON following this exact schema:
 
             <div className="flex gap-3">
               <Button 
-                onClick={() => {
+                onClick={async () => {
                   generatePrompts();
-                  generateAgenda();
+                  // Small delay to ensure prompts are set before generating
+                  setTimeout(() => {
+                    generateAgenda();
+                  }, 100);
                 }}
-                disabled={!apiKey || !selectedModel || (selectedModel === 'custom' && !customModel)}
+                disabled={!apiKey || !selectedModel || (selectedModel === 'custom' && !customModel) || isGenerating}
                 className="flex-1"
               >
-                <Brain className="h-4 w-4 mr-2" />
-                Generate Training Agenda
+                {isGenerating ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    <Brain className="h-4 w-4 mr-2" />
+                    Generate Training Agenda
+                  </>
+                )}
               </Button>
               <Button variant="outline" onClick={() => handleOpenChange(false)}>
                 Cancel
