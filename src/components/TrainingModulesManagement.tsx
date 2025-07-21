@@ -7,30 +7,40 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Trash2, Eye, Edit, Plus, Clock, BookOpen, Brain, Settings } from 'lucide-react';
-import { jsonBinService, TrainingModule, getModulesCredentials } from '@/services/jsonbin';
+import { Trash2, Eye, Edit, Plus, Clock, BookOpen, Brain, Users, Target } from 'lucide-react';
+import { trainingModulesService, TrainingModule } from '@/services/trainingModulesService';
 import { useToast } from '@/hooks/use-toast';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { AIGeneratedModules } from './AIGeneratedModules';
-import { JSONBinCredentialsDialog, JSONBinCredentials } from './JSONBinCredentialsDialog';
-
-const activitySchema = z.object({
-  type: z.enum(['lecture', 'discussion', 'exercise', 'case_study', 'role_play']),
-  description: z.string().min(1, 'Description is required'),
-  duration: z.number().min(1, 'Duration must be at least 1 minute'),
-});
 
 const trainingModuleSchema = z.object({
-  title: z.string().min(1, 'Title is required'),
+  module_title: z.string().min(1, 'Title is required'),
   description: z.string().min(1, 'Description is required'),
-  objectives: z.array(z.object({ value: z.string() })).min(1, 'At least one objective is required'),
-  duration: z.number().min(1, 'Duration must be at least 1 minute'),
-  materials: z.array(z.object({ value: z.string() })),
-  activities: z.array(activitySchema),
+  facilitator: z.string().optional(),
+  participant: z.string().optional(),
+  category: z.string().min(1, 'Category is required'),
   tags: z.array(z.object({ value: z.string() })),
+  duration: z.number().min(1, 'Duration must be at least 1 minute'),
+  delivery_method: z.object({
+    format: z.string().min(1, 'Format is required'),
+    breakout: z.enum(['yes', 'no']),
+  }),
+  group_size: z.object({
+    min: z.number().min(1),
+    max: z.number().min(1),
+    optimal: z.number().min(1),
+  }),
+  mindset_topics: z.array(z.object({ value: z.string() })),
+  delivery_notes: z.string().optional(),
+  sample_materials: z.array(z.object({
+    materialType: z.string(),
+    filename: z.string(),
+    fileFormat: z.string(),
+    fileUrl: z.string(),
+  })).optional(),
 });
 
 type TrainingModuleFormData = z.infer<typeof trainingModuleSchema>;
@@ -43,35 +53,31 @@ export function TrainingModulesManagement() {
   const [editingModule, setEditingModule] = useState<TrainingModule | null>(null);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showAIGenerator, setShowAIGenerator] = useState(false);
-  const [showCredentialsDialog, setShowCredentialsDialog] = useState(false);
   const { toast } = useToast();
 
   const form = useForm<TrainingModuleFormData>({
     resolver: zodResolver(trainingModuleSchema),
     defaultValues: {
-      title: '',
+      module_title: '',
       description: '',
-      objectives: [{ value: '' }],
-      duration: 60,
-      materials: [{ value: '' }],
-      activities: [{ type: 'lecture' as const, description: '', duration: 30 }],
+      facilitator: '',
+      participant: '',
+      category: '',
       tags: [{ value: '' }],
+      duration: 60,
+      delivery_method: {
+        format: 'exercise',
+        breakout: 'no',
+      },
+      group_size: {
+        min: 6,
+        max: 20,
+        optimal: 12,
+      },
+      mindset_topics: [{ value: '' }],
+      delivery_notes: '',
+      sample_materials: [],
     },
-  });
-
-  const { fields: objectiveFields, append: appendObjective, remove: removeObjective } = useFieldArray({
-    control: form.control,
-    name: 'objectives' as const,
-  });
-
-  const { fields: materialFields, append: appendMaterial, remove: removeMaterial } = useFieldArray({
-    control: form.control,
-    name: 'materials' as const,
-  });
-
-  const { fields: activityFields, append: appendActivity, remove: removeActivity } = useFieldArray({
-    control: form.control,
-    name: 'activities' as const,
   });
 
   const { fields: tagFields, append: appendTag, remove: removeTag } = useFieldArray({
@@ -79,36 +85,31 @@ export function TrainingModulesManagement() {
     name: 'tags' as const,
   });
 
-  const loadModules = async () => {
-    // Check if credentials exist
-    const credentials = getModulesCredentials();
-    if (!credentials) {
-      setShowCredentialsDialog(true);
-      return;
-    }
+  const { fields: mindsetFields, append: appendMindset, remove: removeMindset } = useFieldArray({
+    control: form.control,
+    name: 'mindset_topics' as const,
+  });
 
+  const { fields: materialFields, append: appendMaterial, remove: removeMaterial } = useFieldArray({
+    control: form.control,
+    name: 'sample_materials' as const,
+  });
+
+  const loadModules = async () => {
     setLoading(true);
     try {
-      const data = await jsonBinService.getTrainingModules();
+      const data = await trainingModulesService.getTrainingModules();
       setModules(data);
     } catch (error) {
       console.error('Error loading modules:', error);
       toast({
         title: "Error",
-        description: "Failed to load training modules. Please check your credentials.",
+        description: "Failed to load training modules. Please check your authentication.",
         variant: "destructive",
       });
-      // Show credentials dialog if there's an error
-      setShowCredentialsDialog(true);
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleCredentialsSet = (credentials: JSONBinCredentials) => {
-    // Credentials are already saved in localStorage by the dialog
-    // Now try to load the modules
-    loadModules();
   };
 
   useEffect(() => {
@@ -118,7 +119,7 @@ export function TrainingModulesManagement() {
   const handleDelete = async (id: string) => {
     setDeleteLoading(id);
     try {
-      await jsonBinService.deleteTrainingModule(id);
+      await trainingModulesService.deleteTrainingModule(id);
       setModules(prev => prev.filter(mod => mod.id !== id));
       toast({
         title: 'Success',
@@ -137,15 +138,37 @@ export function TrainingModulesManagement() {
 
   const handleAdd = async (data: TrainingModuleFormData) => {
     try {
-      // Filter out empty strings and convert to string arrays
+      // Clean up the data and ensure all required fields are present
       const cleanedData = {
-        ...data,
-        objectives: data.objectives.map(obj => obj.value).filter(val => val.trim() !== ''),
-        materials: data.materials.map(mat => mat.value).filter(val => val.trim() !== ''),
+        module_title: data.module_title,
+        description: data.description,
+        facilitator: data.facilitator,
+        participant: data.participant,
+        category: data.category,
         tags: data.tags.map(tag => tag.value).filter(val => val.trim() !== ''),
+        duration: data.duration,
+        delivery_method: {
+          format: data.delivery_method.format,
+          breakout: data.delivery_method.breakout,
+        },
+        group_size: {
+          min: data.group_size.min,
+          max: data.group_size.max,
+          optimal: data.group_size.optimal,
+        },
+        mindset_topics: data.mindset_topics.map(topic => topic.value).filter(val => val.trim() !== ''),
+        delivery_notes: data.delivery_notes,
+        sample_materials: data.sample_materials?.filter(material => 
+          material.materialType && material.filename && material.fileFormat && material.fileUrl
+        ).map(material => ({
+          materialType: material.materialType,
+          filename: material.filename,
+          fileFormat: material.fileFormat,
+          fileUrl: material.fileUrl,
+        })) || [],
       };
       
-      await jsonBinService.addTrainingModule(cleanedData as Omit<TrainingModule, 'id' | 'createdAt' | 'updatedAt'>);
+      await trainingModulesService.addTrainingModule(cleanedData);
       await loadModules();
       setShowAddDialog(false);
       form.reset();
@@ -166,15 +189,37 @@ export function TrainingModulesManagement() {
     if (!editingModule) return;
     
     try {
-      // Filter out empty strings and convert to string arrays
+      // Clean up the data and ensure all required fields are present
       const cleanedData = {
-        ...data,
-        objectives: data.objectives.map(obj => obj.value).filter(val => val.trim() !== ''),
-        materials: data.materials.map(mat => mat.value).filter(val => val.trim() !== ''),
+        module_title: data.module_title,
+        description: data.description,
+        facilitator: data.facilitator,
+        participant: data.participant,
+        category: data.category,
         tags: data.tags.map(tag => tag.value).filter(val => val.trim() !== ''),
+        duration: data.duration,
+        delivery_method: {
+          format: data.delivery_method.format,
+          breakout: data.delivery_method.breakout,
+        },
+        group_size: {
+          min: data.group_size.min,
+          max: data.group_size.max,
+          optimal: data.group_size.optimal,
+        },
+        mindset_topics: data.mindset_topics.map(topic => topic.value).filter(val => val.trim() !== ''),
+        delivery_notes: data.delivery_notes,
+        sample_materials: data.sample_materials?.filter(material => 
+          material.materialType && material.filename && material.fileFormat && material.fileUrl
+        ).map(material => ({
+          materialType: material.materialType,
+          filename: material.filename,
+          fileFormat: material.fileFormat,
+          fileUrl: material.fileUrl,
+        })) || [],
       };
       
-      await jsonBinService.updateTrainingModule(editingModule.id, cleanedData as Partial<TrainingModule>);
+      await trainingModulesService.updateTrainingModule(editingModule.id, cleanedData);
       await loadModules();
       setEditingModule(null);
       form.reset();
@@ -194,13 +239,25 @@ export function TrainingModulesManagement() {
   const startEdit = (module: TrainingModule) => {
     setEditingModule(module);
     form.reset({
-      title: module.title,
+      module_title: module.module_title,
       description: module.description,
-      objectives: module.objectives.map(obj => ({ value: obj })),
-      duration: module.duration,
-      materials: module.materials.map(mat => ({ value: mat })),
-      activities: module.activities,
+      facilitator: module.facilitator || '',
+      participant: module.participant || '',
+      category: module.category,
       tags: module.tags.map(tag => ({ value: tag })),
+      duration: module.duration,
+      delivery_method: {
+        format: module.delivery_method.format,
+        breakout: module.delivery_method.breakout as 'yes' | 'no',
+      },
+      group_size: {
+        min: module.group_size.min,
+        max: module.group_size.max,
+        optimal: module.group_size.optimal,
+      },
+      mindset_topics: module.mindset_topics.map(topic => ({ value: topic })),
+      delivery_notes: module.delivery_notes || '',
+      sample_materials: module.sample_materials || [],
     });
   };
 
@@ -216,19 +273,35 @@ export function TrainingModulesManagement() {
   const ModuleForm = ({ onSubmit, isEditing = false }: { onSubmit: (data: TrainingModuleFormData) => void; isEditing?: boolean }) => (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <FormField
-          control={form.control}
-          name="title"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Title</FormLabel>
-              <FormControl>
-                <Input {...field} placeholder="Module title..." />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="module_title"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Module Title</FormLabel>
+                <FormControl>
+                  <Input {...field} placeholder="Enter module title..." />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="category"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Category</FormLabel>
+                <FormControl>
+                  <Input {...field} placeholder="e.g. Leadership Development" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
         <FormField
           control={form.control}
@@ -244,183 +317,157 @@ export function TrainingModulesManagement() {
           )}
         />
 
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="facilitator"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Facilitator Notes</FormLabel>
+                <FormControl>
+                  <Textarea {...field} placeholder="Notes for facilitator..." />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="participant"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Participant Information</FormLabel>
+                <FormControl>
+                  <Textarea {...field} placeholder="Information for participants..." />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="duration"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Duration (minutes)</FormLabel>
+                <FormControl>
+                  <Input 
+                    type="number" 
+                    {...field} 
+                    onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="delivery_method.format"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Delivery Format</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select format" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="exercise">Exercise</SelectItem>
+                    <SelectItem value="lecture">Lecture</SelectItem>
+                    <SelectItem value="discussion">Discussion</SelectItem>
+                    <SelectItem value="game">Game</SelectItem>
+                    <SelectItem value="workshop">Workshop</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
         <FormField
           control={form.control}
-          name="duration"
+          name="delivery_method.breakout"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Duration (minutes)</FormLabel>
-              <FormControl>
-                <Input 
-                  type="number" 
-                  {...field} 
-                  onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                />
-              </FormControl>
+              <FormLabel>Includes Breakout Sessions?</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select breakout option" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="yes">Yes</SelectItem>
+                  <SelectItem value="no">No</SelectItem>
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        <div>
-          <FormLabel>Objectives</FormLabel>
-          {objectiveFields.map((field, index) => (
-            <div key={field.id} className="flex gap-2 mt-2">
-              <FormField
-                control={form.control}
-                name={`objectives.${index}.value` as const}
-                render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormControl>
-                      <Input {...field} placeholder="Enter objective..." />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button
-                type="button"
-                variant="outline"
-                size="icon"
-                onClick={() => removeObjective(index)}
-                disabled={objectiveFields.length === 1}
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            </div>
-          ))}
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => appendObjective({ value: '' })}
-            className="mt-2"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Objective
-          </Button>
-        </div>
+        <div className="grid grid-cols-3 gap-4">
+          <FormField
+            control={form.control}
+            name="group_size.min"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Min Group Size</FormLabel>
+                <FormControl>
+                  <Input 
+                    type="number" 
+                    {...field} 
+                    onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <div>
-          <FormLabel>Materials</FormLabel>
-          {materialFields.map((field, index) => (
-            <div key={field.id} className="flex gap-2 mt-2">
-              <FormField
-                control={form.control}
-                name={`materials.${index}.value` as const}
-                render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormControl>
-                      <Input {...field} placeholder="Enter material..." />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button
-                type="button"
-                variant="outline"
-                size="icon"
-                onClick={() => removeMaterial(index)}
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            </div>
-          ))}
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => appendMaterial({ value: '' })}
-            className="mt-2"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Material
-          </Button>
-        </div>
+          <FormField
+            control={form.control}
+            name="group_size.optimal"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Optimal Group Size</FormLabel>
+                <FormControl>
+                  <Input 
+                    type="number" 
+                    {...field} 
+                    onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <div>
-          <FormLabel>Activities</FormLabel>
-          {activityFields.map((field, index) => (
-            <div key={field.id} className="border p-4 rounded-md mt-2">
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name={`activities.${index}.type` as const}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Type</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select activity type" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="lecture">Lecture</SelectItem>
-                          <SelectItem value="discussion">Discussion</SelectItem>
-                          <SelectItem value="exercise">Exercise</SelectItem>
-                          <SelectItem value="case_study">Case Study</SelectItem>
-                          <SelectItem value="role_play">Role Play</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name={`activities.${index}.duration` as const}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Duration (minutes)</FormLabel>
-                      <FormControl>
-                        <Input 
-                          type="number" 
-                          {...field} 
-                          onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-              </div>
-              
-              <FormField
-                control={form.control}
-                name={`activities.${index}.description` as const}
-                render={({ field }) => (
-                  <FormItem className="mt-4">
-                    <FormLabel>Description</FormLabel>
-                    <FormControl>
-                      <Textarea {...field} placeholder="Activity description..." />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-              
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => removeActivity(index)}
-                className="mt-2"
-              >
-                <Trash2 className="h-4 w-4 mr-2" />
-                Remove Activity
-              </Button>
-            </div>
-          ))}
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => appendActivity({ type: 'lecture' as const, description: '', duration: 30 })}
-            className="mt-2"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Activity
-          </Button>
+          <FormField
+            control={form.control}
+            name="group_size.max"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Max Group Size</FormLabel>
+                <FormControl>
+                  <Input 
+                    type="number" 
+                    {...field} 
+                    onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
 
         <div>
@@ -461,6 +508,58 @@ export function TrainingModulesManagement() {
           </Button>
         </div>
 
+        <div>
+          <FormLabel>Mindset Topics</FormLabel>
+          {mindsetFields.map((field, index) => (
+            <div key={field.id} className="flex gap-2 mt-2">
+              <FormField
+                control={form.control}
+                name={`mindset_topics.${index}.value` as const}
+                render={({ field }) => (
+                  <FormItem className="flex-1">
+                    <FormControl>
+                      <Input {...field} placeholder="Enter mindset topic..." />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                onClick={() => removeMindset(index)}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
+          ))}
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => appendMindset({ value: '' })}
+            className="mt-2"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Add Mindset Topic
+          </Button>
+        </div>
+
+        <FormField
+          control={form.control}
+          name="delivery_notes"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Delivery Notes</FormLabel>
+              <FormControl>
+                <Textarea {...field} placeholder="Instructions for delivery..." />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         <Button type="submit" className="w-full">
           {isEditing ? 'Update Module' : 'Add Module'}
         </Button>
@@ -482,25 +581,10 @@ export function TrainingModulesManagement() {
 
   return (
     <>
-      <JSONBinCredentialsDialog
-        open={showCredentialsDialog}
-        onOpenChange={setShowCredentialsDialog}
-        onCredentialsSet={handleCredentialsSet}
-        type="modules"
-      />
-      
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <h2 className="text-2xl font-bold">Training Modules Management</h2>
           <div className="flex gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setShowCredentialsDialog(true)}
-              className="flex items-center gap-2"
-            >
-              <Settings className="h-4 w-4" />
-              Configure JSONBin
-            </Button>
             <Button
               onClick={() => setShowAIGenerator(!showAIGenerator)}
               variant={showAIGenerator ? "default" : "outline"}
@@ -528,192 +612,203 @@ export function TrainingModulesManagement() {
           </div>
         </div>
 
-      {/* Edit Dialog */}
-      <Dialog open={!!editingModule} onOpenChange={(open) => !open && setEditingModule(null)}>
-        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Edit Training Module</DialogTitle>
-          </DialogHeader>
-          <ModuleForm onSubmit={handleEdit} isEditing />
-        </DialogContent>
-      </Dialog>
+        {/* Edit Dialog */}
+        <Dialog open={!!editingModule} onOpenChange={(open) => !open && setEditingModule(null)}>
+          <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Edit Training Module</DialogTitle>
+            </DialogHeader>
+            <ModuleForm onSubmit={handleEdit} isEditing />
+          </DialogContent>
+        </Dialog>
 
-      {/* View Details Dialog */}
-      <Dialog open={!!selectedModule} onOpenChange={(open) => !open && setSelectedModule(null)}>
-        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>{selectedModule?.title}</DialogTitle>
-          </DialogHeader>
-          {selectedModule && (
-            <div className="space-y-6">
-              <div>
-                <h4 className="font-semibold mb-2">Description</h4>
-                <p className="text-muted-foreground">{selectedModule.description}</p>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
+        {/* View Details Dialog */}
+        <Dialog open={!!selectedModule} onOpenChange={(open) => !open && setSelectedModule(null)}>
+          <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>{selectedModule?.module_title}</DialogTitle>
+            </DialogHeader>
+            {selectedModule && (
+              <div className="space-y-6">
                 <div>
-                  <h4 className="font-semibold mb-2">Duration</h4>
-                  <p className="text-muted-foreground">{formatDuration(selectedModule.duration)}</p>
+                  <h4 className="font-semibold mb-2">Description</h4>
+                  <p className="text-muted-foreground">{selectedModule.description}</p>
                 </div>
-                <div>
-                  <h4 className="font-semibold mb-2">Activities Count</h4>
-                  <p className="text-muted-foreground">{selectedModule.activities?.length || 0}</p>
-                </div>
-              </div>
 
-              {selectedModule.objectives && selectedModule.objectives.length > 0 && (
-                <div>
-                  <h4 className="font-semibold mb-2">Objectives</h4>
-                  <ul className="list-disc list-inside space-y-1">
-                    {selectedModule.objectives.map((objective, index) => (
-                      <li key={index} className="text-muted-foreground">{objective}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
+                {selectedModule.facilitator && (
+                  <div>
+                    <h4 className="font-semibold mb-2">Facilitator Notes</h4>
+                    <p className="text-muted-foreground">{selectedModule.facilitator}</p>
+                  </div>
+                )}
 
-              {selectedModule.materials && selectedModule.materials.length > 0 && (
-                <div>
-                  <h4 className="font-semibold mb-2">Materials</h4>
-                  <ul className="list-disc list-inside space-y-1">
-                    {selectedModule.materials.map((material, index) => (
-                      <li key={index} className="text-muted-foreground">{material}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {selectedModule.activities && selectedModule.activities.length > 0 && (
-                <div>
-                  <h4 className="font-semibold mb-2">Activities</h4>
-                  <div className="space-y-3">
-                    {selectedModule.activities.map((activity, index) => (
-                      <div key={index} className="border p-3 rounded">
-                        <div className="flex justify-between items-center mb-2">
-                          <Badge variant="outline">{activity.type}</Badge>
-                          <span className="text-sm text-muted-foreground">
-                            <Clock className="w-4 h-4 inline mr-1" />
-                            {formatDuration(activity.duration)}
-                          </span>
-                        </div>
-                        <p className="text-sm text-muted-foreground">{activity.description}</p>
-                      </div>
-                    ))}
+                {selectedModule.participant && (
+                  <div>
+                    <h4 className="font-semibold mb-2">Participant Information</h4>
+                    <p className="text-muted-foreground">{selectedModule.participant}</p>
+                  </div>
+                )}
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <h4 className="font-semibold mb-2">Duration</h4>
+                    <p className="text-muted-foreground">{formatDuration(selectedModule.duration)}</p>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold mb-2">Category</h4>
+                    <p className="text-muted-foreground">{selectedModule.category}</p>
                   </div>
                 </div>
-              )}
 
-              {selectedModule.tags && selectedModule.tags.length > 0 && (
-                <div>
-                  <h4 className="font-semibold mb-2">Tags</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedModule.tags.map((tag, index) => (
-                      <Badge key={index} variant="secondary">{tag}</Badge>
-                    ))}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <h4 className="font-semibold mb-2">Delivery Method</h4>
+                    <p className="text-muted-foreground">
+                      {selectedModule.delivery_method.format} 
+                      {selectedModule.delivery_method.breakout === 'yes' && ' (with breakouts)'}
+                    </p>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold mb-2">Group Size</h4>
+                    <p className="text-muted-foreground">
+                      {selectedModule.group_size.min}-{selectedModule.group_size.max} 
+                      (optimal: {selectedModule.group_size.optimal})
+                    </p>
                   </div>
                 </div>
-              )}
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
 
-      {/* Modules Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {modules.map((module) => (
-          <Card key={module.id} className="hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <BookOpen className="w-5 h-5" />
-                {module.title}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground mb-4 line-clamp-3">{module.description}</p>
-              
-              <div className="flex items-center gap-4 mb-4 text-sm text-muted-foreground">
-                <span className="flex items-center gap-1">
-                  <Clock className="w-4 h-4" />
-                  {formatDuration(module.duration)}
-                </span>
-                {module.activities && (
-                  <span>{module.activities.length} activities</span>
+                {selectedModule.mindset_topics && selectedModule.mindset_topics.length > 0 && (
+                  <div>
+                    <h4 className="font-semibold mb-2">Mindset Topics</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedModule.mindset_topics.map((topic, index) => (
+                        <Badge key={index} variant="outline">{topic}</Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {selectedModule.delivery_notes && (
+                  <div>
+                    <h4 className="font-semibold mb-2">Delivery Notes</h4>
+                    <p className="text-muted-foreground">{selectedModule.delivery_notes}</p>
+                  </div>
+                )}
+
+                {selectedModule.tags && selectedModule.tags.length > 0 && (
+                  <div>
+                    <h4 className="font-semibold mb-2">Tags</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedModule.tags.map((tag, index) => (
+                        <Badge key={index} variant="secondary">{tag}</Badge>
+                      ))}
+                    </div>
+                  </div>
                 )}
               </div>
+            )}
+          </DialogContent>
+        </Dialog>
 
-              {module.tags && module.tags.length > 0 && (
-                <div className="flex flex-wrap gap-1 mb-4">
-                  {module.tags.slice(0, 3).map((tag, index) => (
-                    <Badge key={index} variant="secondary" className="text-xs">{tag}</Badge>
-                  ))}
-                  {module.tags.length > 3 && (
-                    <Badge variant="outline" className="text-xs">+{module.tags.length - 3}</Badge>
+        {/* Modules Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {modules.map((module) => (
+            <Card key={module.id} className="hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <BookOpen className="w-5 h-5" />
+                  {module.module_title}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground mb-4 line-clamp-3">{module.description}</p>
+                
+                <div className="flex items-center gap-4 mb-4 text-sm text-muted-foreground">
+                  <span className="flex items-center gap-1">
+                    <Clock className="w-4 h-4" />
+                    {formatDuration(module.duration)}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Users className="w-4 h-4" />
+                    {module.group_size.optimal}
+                  </span>
+                </div>
+
+                <div className="mb-4">
+                  <Badge variant="outline" className="text-xs mb-2">{module.category}</Badge>
+                  {module.tags && module.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1">
+                      {module.tags.slice(0, 3).map((tag, index) => (
+                        <Badge key={index} variant="secondary" className="text-xs">{tag}</Badge>
+                      ))}
+                      {module.tags.length > 3 && (
+                        <Badge variant="outline" className="text-xs">+{module.tags.length - 3}</Badge>
+                      )}
+                    </div>
                   )}
                 </div>
-              )}
 
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setSelectedModule(module)}
-                  className="flex-1"
-                >
-                  <Eye className="w-4 h-4 mr-1" />
-                  View
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => startEdit(module)}
-                  className="flex-1"
-                >
-                  <Edit className="w-4 h-4 mr-1" />
-                  Edit
-                </Button>
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button variant="destructive" size="sm">
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Delete Training Module</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        Are you sure you want to delete "{module.title}"? This action cannot be undone.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction
-                        onClick={() => handleDelete(module.id)}
-                        disabled={deleteLoading === module.id}
-                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                      >
-                        {deleteLoading === module.id ? 'Deleting...' : 'Delete'}
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {modules.length === 0 && !loading && (
-        <div className="text-center py-12">
-          <BookOpen className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-          <h3 className="text-lg font-semibold mb-2">No training modules found</h3>
-          <p className="text-muted-foreground mb-4">Get started by adding your first training module.</p>
-          <Button onClick={() => setShowAddDialog(true)}>
-            <Plus className="w-4 h-4 mr-2" />
-            Add First Module
-          </Button>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setSelectedModule(module)}
+                    className="flex-1"
+                  >
+                    <Eye className="w-4 h-4 mr-1" />
+                    View
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => startEdit(module)}
+                    className="flex-1"
+                  >
+                    <Edit className="w-4 h-4 mr-1" />
+                    Edit
+                  </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="destructive" size="sm">
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Delete Training Module</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Are you sure you want to delete "{module.module_title}"? This action cannot be undone.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={() => handleDelete(module.id)}
+                          disabled={deleteLoading === module.id}
+                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
+                          {deleteLoading === module.id ? 'Deleting...' : 'Delete'}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
-      )}
+
+        {modules.length === 0 && !loading && (
+          <div className="text-center py-12">
+            <BookOpen className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+            <h3 className="text-lg font-semibold mb-2">No training modules found</h3>
+            <p className="text-muted-foreground mb-4">Get started by adding your first training module or load existing ones from the database.</p>
+            <Button onClick={() => setShowAddDialog(true)}>
+              <Plus className="w-4 h-4 mr-2" />
+              Add First Module
+            </Button>
+          </div>
+        )}
       </div>
     </>
   );
