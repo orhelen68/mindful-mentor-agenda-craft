@@ -287,8 +287,8 @@ The response must be valid JSON following this exact schema:
       resetDialog();
       
       toast({
-        title: "Agenda Generated",
-        description: "AI-generated training agenda has been created successfully",
+        title: "Agenda Ready for Review",
+        description: "AI-generated training agenda is ready for you to review and save",
       });
     }
   };
@@ -627,7 +627,7 @@ The response must be valid JSON following this exact schema:
             <div className="flex gap-3">
               <Button onClick={finalizeAgenda} className="flex-1">
                 <CheckCircle className="h-4 w-4 mr-2" />
-                Create This Agenda
+                Use This Agenda
               </Button>
               <Button 
                 variant="outline" 

@@ -637,9 +637,12 @@ export function TrainingModulesManagement() {
               Add Module
             </Button>
             <Button 
-              onClick={() => setShowAIGenerator(true)} 
+              onClick={() => {
+                console.log('AI Generate clicked');
+                setShowAIGenerator(true);
+              }} 
               variant="outline" 
-              className="bg-white/50 border-purple-200 hover:bg-purple-50"
+              className="bg-white/50 border-purple-200 hover:bg-purple-50 transition-all duration-200"
             >
               <Brain className="w-4 h-4 mr-2" />
               AI Generate

@@ -154,17 +154,28 @@ export function TrainingRequirementsForm({ onSuccess }: { onSuccess?: () => void
 
   const handleAIAgendaGenerated = async (agenda: Omit<TrainingAgendaFormData, 'id' | 'created_at' | 'updated_at'>) => {
     try {
-      await trainingAgendasService.addTrainingAgenda(agenda);
+      // Set the dialog to close first
+      setShowAIDialog(false);
+      
+      // Store the agenda data temporarily for the create agenda page to use
+      sessionStorage.setItem('aiGeneratedAgenda', JSON.stringify(agenda));
+      
       toast({
-        title: "AI Agenda Created!",
-        description: "Your training agenda has been generated and saved successfully.",
+        title: "AI Agenda Ready!",
+        description: "Review and save your AI-generated agenda.",
       });
-      // Navigate to view the created agenda
-      window.location.href = '/create-agenda';
+      
+      // Navigate to create agenda page with the requirement ID
+      if (savedRequirement?.id) {
+        window.location.href = `/create-agenda/${savedRequirement.id}`;
+      } else {
+        window.location.href = '/create-agenda';
+      }
     } catch (error) {
+      console.error('Error handling AI agenda:', error);
       toast({
-        title: "Error saving agenda",
-        description: "Please try again later.",
+        title: "Error",
+        description: "Failed to process the AI-generated agenda.",
         variant: "destructive",
       });
     }

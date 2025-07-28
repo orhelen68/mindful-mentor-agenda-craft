@@ -8,7 +8,7 @@ import { trainingRequirementsService, TrainingRequirement } from '@/services/tra
 import { trainingModulesService, TrainingModule } from '@/services/trainingModulesService';
 import { trainingAgendasService, TrainingAgendaFormData } from '@/services/trainingAgendasService';
 import { AgendaBuilder } from '@/components/AgendaBuilder';
-import { ArrowLeft, BookOpen, Clock, Users } from 'lucide-react';
+import { ArrowLeft, BookOpen, Clock, Users, CheckCircle } from 'lucide-react';
 
 export default function CreateAgenda() {
   const { requirementsId } = useParams();
@@ -19,9 +19,22 @@ export default function CreateAgenda() {
   const [modules, setModules] = useState<TrainingModule[]>([]);
   const [matchedModules, setMatchedModules] = useState<TrainingModule[]>([]);
   const [loading, setLoading] = useState(true);
+  const [aiGeneratedAgenda, setAiGeneratedAgenda] = useState<Omit<TrainingAgendaFormData, 'id' | 'createdAt' | 'updatedAt'> | null>(null);
 
   useEffect(() => {
     loadData();
+    
+    // Check for AI-generated agenda in sessionStorage
+    const storedAgenda = sessionStorage.getItem('aiGeneratedAgenda');
+    if (storedAgenda) {
+      try {
+        const parsedAgenda = JSON.parse(storedAgenda);
+        setAiGeneratedAgenda(parsedAgenda);
+        sessionStorage.removeItem('aiGeneratedAgenda'); // Clear after use
+      } catch (error) {
+        console.error('Error parsing stored agenda:', error);
+      }
+    }
   }, [requirementsId]);
 
   const loadData = async () => {
@@ -222,12 +235,34 @@ export default function CreateAgenda() {
           </CardContent>
         </Card>
 
+        {/* AI Generated Alert */}
+        {aiGeneratedAgenda && (
+          <Card className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-950/20 dark:to-blue-950/20 border-purple-200 dark:border-purple-700">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
+                  <CheckCircle className="h-5 w-5 text-white" />
+                </div>
+                <div>
+                  <p className="font-medium text-purple-700 dark:text-purple-300">
+                    AI-Generated Agenda Loaded
+                  </p>
+                  <p className="text-sm text-purple-600 dark:text-purple-400">
+                    Review the preview tab and click "Save Training Agenda" to finalize.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Agenda Builder */}
         <AgendaBuilder
           requirement={requirement}
           availableModules={modules}
           matchedModules={matchedModules}
           onSave={handleSaveAgenda}
+          initialAgenda={aiGeneratedAgenda}
         />
       </div>
     </div>

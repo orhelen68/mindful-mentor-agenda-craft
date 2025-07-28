@@ -27,25 +27,30 @@ interface AgendaBuilderProps {
   availableModules: TrainingModule[];
   matchedModules: TrainingModule[];
   onSave: (agenda: Omit<TrainingAgendaFormData, 'id' | 'createdAt' | 'updatedAt'>) => void;
+  initialAgenda?: Omit<TrainingAgendaFormData, 'id' | 'createdAt' | 'updatedAt'>;
 }
 
 export function AgendaBuilder({ 
   requirement, 
   availableModules, 
   matchedModules, 
-  onSave 
+  onSave,
+  initialAgenda
 }: AgendaBuilderProps) {
-  const [agendaTitle, setAgendaTitle] = useState(requirement.trainingTitle);
-  const [agendaDescription, setAgendaDescription] = useState(requirement.description);
-  const [timeslots, setTimeslots] = useState<Timeslot[]>([]);
-  const [facilitatorNotes, setFacilitatorNotes] = useState('');
-  const [materialsNeeded, setMaterialsNeeded] = useState<string[]>([]);
-  const [preReading, setPreReading] = useState<string[]>([]);
-  const [postFollowUp, setPostFollowUp] = useState<string[]>([]);
-  const [currentTab, setCurrentTab] = useState('builder');
+  const [agendaTitle, setAgendaTitle] = useState(initialAgenda?.trainingTitle || requirement.trainingTitle);
+  const [agendaDescription, setAgendaDescription] = useState(initialAgenda?.overview?.description || requirement.description);
+  const [timeslots, setTimeslots] = useState<Timeslot[]>(initialAgenda?.timeslots || []);
+  const [facilitatorNotes, setFacilitatorNotes] = useState(initialAgenda?.facilitatorNotes || '');
+  const [materialsNeeded, setMaterialsNeeded] = useState<string[]>(initialAgenda?.materialsList || []);
+  const [preReading, setPreReading] = useState<string[]>(initialAgenda?.preReading || []);
+  const [postFollowUp, setPostFollowUp] = useState<string[]>(initialAgenda?.postWorkshopFollowUp || []);
+  const [currentTab, setCurrentTab] = useState(initialAgenda ? 'preview' : 'builder');
 
   // Initialize with basic structure
   useEffect(() => {
+    // Skip initialization if we already have initial agenda data
+    if (initialAgenda) return;
+    
     const targetDuration = requirement.constraints?.duration || 480; // 8 hours default
     const groupSize = requirement.deliveryPreferences?.groupSize || 12;
     
@@ -79,7 +84,7 @@ export function AgendaBuilder({
       .slice(0, 5);
     setMaterialsNeeded(initialMaterials);
 
-  }, [requirement, matchedModules]);
+  }, [requirement, matchedModules, initialAgenda]);
 
   const calculateTotalDuration = () => {
     return timeslots.reduce((total, slot) => total + slot.duration, 0);
