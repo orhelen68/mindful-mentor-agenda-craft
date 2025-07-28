@@ -109,10 +109,10 @@ export function TrainingRequirementsForm({ onSuccess }: { onSuccess?: () => void
     try {
       // Transform data to match service interface
       const serviceData = {
-        training_id: data.trainingID,
-        training_title: data.trainingTitle,
+        trainingID: data.trainingID,
+        trainingTitle: data.trainingTitle,
         description: data.description,
-        target_audience: {
+        targetAudience: {
           experienceLevel: data.targetAudience.experienceLevel,
           industryContext: data.targetAudience.industryContext,
         },
@@ -120,12 +120,12 @@ export function TrainingRequirementsForm({ onSuccess }: { onSuccess?: () => void
           duration: data.constraints.duration,
           interactionLevel: data.constraints.interactionLevel,
         },
-        mindset_focus: {
+        mindsetFocus: {
           learningObjectives: data.mindsetFocus.learningObjectives.map(obj => obj.value).filter(val => val.trim() !== ''),
           primaryTopics: data.mindsetFocus.primaryTopics.map(topic => topic.value).filter(val => val.trim() !== ''),
           secondaryTopics: data.mindsetFocus.secondaryTopics.map(topic => topic.value).filter(val => val.trim() !== ''),
         },
-        delivery_preferences: {
+        deliveryPreferences: {
           format: data.deliveryPreferences.format,
           groupSize: data.deliveryPreferences.groupSize,
         },

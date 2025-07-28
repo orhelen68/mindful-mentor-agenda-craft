@@ -134,7 +134,7 @@ export function TrainingModulesManagement() {
         const moduleTags = module.tags?.map(tag => tag.toLowerCase()) || [];
         return searchTerms.some(term =>
           moduleTags.some(tag => tag.includes(term)) ||
-          module.module_title.toLowerCase().includes(term) ||
+          module.moduleTitle.toLowerCase().includes(term) ||
           module.description.toLowerCase().includes(term)
         );
       });
@@ -171,25 +171,25 @@ export function TrainingModulesManagement() {
     try {
       // Clean up the data and ensure all required fields are present
       const cleanedData = {
-        module_title: data.module_title,
+        moduleTitle: data.module_title,
         description: data.description,
         facilitator: data.facilitator,
         participant: data.participant,
         category: data.category,
         tags: data.tags.map(tag => tag.value).filter(val => val.trim() !== ''),
         duration: data.duration,
-        delivery_method: {
+        deliveryMethod: {
           format: data.delivery_method.format,
           breakout: data.delivery_method.breakout,
         },
-        group_size: {
+        groupSize: {
           min: data.group_size.min,
           max: data.group_size.max,
           optimal: data.group_size.optimal,
         },
-        mindset_topics: data.mindset_topics.map(topic => topic.value).filter(val => val.trim() !== ''),
-        delivery_notes: data.delivery_notes,
-        sample_materials: data.sample_materials?.filter(material =>
+        mindsetTopics: data.mindset_topics.map(topic => topic.value).filter(val => val.trim() !== ''),
+        deliveryNotes: data.delivery_notes,
+        sampleMaterials: data.sample_materials?.filter(material =>
           material.materialType && material.filename && material.fileFormat && material.fileUrl
         ).map(material => ({
           materialType: material.materialType,
@@ -222,25 +222,25 @@ export function TrainingModulesManagement() {
     try {
       // Clean up the data and ensure all required fields are present
       const cleanedData = {
-        module_title: data.module_title,
+        moduleTitle: data.module_title,
         description: data.description,
         facilitator: data.facilitator,
         participant: data.participant,
         category: data.category,
         tags: data.tags.map(tag => tag.value).filter(val => val.trim() !== ''),
         duration: data.duration,
-        delivery_method: {
+        deliveryMethod: {
           format: data.delivery_method.format,
           breakout: data.delivery_method.breakout,
         },
-        group_size: {
+        groupSize: {
           min: data.group_size.min,
           max: data.group_size.max,
           optimal: data.group_size.optimal,
         },
-        mindset_topics: data.mindset_topics.map(topic => topic.value).filter(val => val.trim() !== ''),
-        delivery_notes: data.delivery_notes,
-        sample_materials: data.sample_materials?.filter(material =>
+        mindsetTopics: data.mindset_topics.map(topic => topic.value).filter(val => val.trim() !== ''),
+        deliveryNotes: data.delivery_notes,
+        sampleMaterials: data.sample_materials?.filter(material =>
           material.materialType && material.filename && material.fileFormat && material.fileUrl
         ).map(material => ({
           materialType: material.materialType,
@@ -270,7 +270,7 @@ export function TrainingModulesManagement() {
   const startEdit = (module: TrainingModule) => {
     setEditingModule(module);
     form.reset({
-      module_title: module.module_title,
+      module_title: module.moduleTitle,
       description: module.description,
       facilitator: module.facilitator || '',
       participant: module.participant || '',
@@ -278,17 +278,17 @@ export function TrainingModulesManagement() {
       tags: module.tags.map(tag => ({ value: tag })),
       duration: module.duration,
       delivery_method: {
-        format: module.delivery_method.format,
-        breakout: module.delivery_method.breakout as 'yes' | 'no',
+        format: module.deliveryMethod.format,
+        breakout: module.deliveryMethod.breakout as 'yes' | 'no',
       },
       group_size: {
-        min: module.group_size.min,
-        max: module.group_size.max,
-        optimal: module.group_size.optimal,
+        min: module.groupSize.min,
+        max: module.groupSize.max,
+        optimal: module.groupSize.optimal,
       },
-      mindset_topics: module.mindset_topics.map(topic => ({ value: topic })),
-      delivery_notes: module.delivery_notes || '',
-      sample_materials: module.sample_materials || [],
+      mindset_topics: module.mindsetTopics.map(topic => ({ value: topic })),
+      delivery_notes: module.deliveryNotes || '',
+      sample_materials: module.sampleMaterials || [],
     });
   };
 
@@ -723,7 +723,7 @@ export function TrainingModulesManagement() {
                       {module.category}
                     </div>
                     <CardTitle className="text-lg line-clamp-2 bg-gradient-to-r from-purple-700 to-pink-700 bg-clip-text text-transparent">
-                      {module.module_title}
+                      {module.moduleTitle}
                     </CardTitle>
                   </div>
                 </div>
@@ -739,7 +739,7 @@ export function TrainingModulesManagement() {
                     </div>
                     <div className="flex items-center text-sm bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20 p-2 rounded-lg border border-blue-100 dark:border-blue-800">
                       <Users className="w-4 h-4 mr-2 text-blue-600 dark:text-blue-400" />
-                      <span className="text-blue-700 dark:text-cyan-300">{module.group_size.optimal}</span>
+                      <span className="text-blue-700 dark:text-cyan-300">{module.groupSize.optimal}</span>
                     </div>
                   </div>
 
@@ -768,7 +768,7 @@ export function TrainingModulesManagement() {
                         <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto bg-gradient-to-br from-white to-gray-50/50 dark:from-gray-900 dark:to-gray-800/50">
                           <DialogHeader className="border-b border-gray-100 dark:border-gray-700 pb-4">
                             <DialogTitle className="text-2xl bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                              {selectedModule?.module_title}
+                              {selectedModule?.moduleTitle}
                             </DialogTitle>
                           </DialogHeader>
                           {selectedModule && (
@@ -790,10 +790,10 @@ export function TrainingModulesManagement() {
                                       <strong className="text-blue-600 dark:text-blue-400">Description:</strong> 
                                       <p className="mt-1">{selectedModule.description}</p>
                                     </div>
-                                    {selectedModule.delivery_notes && (
+                                    {selectedModule.deliveryNotes && (
                                       <div className="bg-white/50 dark:bg-gray-800/50 p-3 rounded-lg">
                                         <strong className="text-blue-600 dark:text-blue-400">Delivery Notes:</strong> 
-                                        <p className="mt-1">{selectedModule.delivery_notes}</p>
+                                        <p className="mt-1">{selectedModule.deliveryNotes}</p>
                                       </div>
                                     )}
                                   </CardContent>
@@ -813,17 +813,17 @@ export function TrainingModulesManagement() {
                                     </div>
                                     <div className="bg-white/50 dark:bg-gray-800/50 p-3 rounded-lg">
                                       <strong className="text-orange-600 dark:text-orange-400">Format:</strong> 
-                                      <Badge variant="outline" className="ml-2 border-purple-200 text-purple-700">{selectedModule.delivery_method.format}</Badge>
+                                      <Badge variant="outline" className="ml-2 border-purple-200 text-purple-700">{selectedModule.deliveryMethod.format}</Badge>
                                     </div>
                                     <div className="bg-white/50 dark:bg-gray-800/50 p-3 rounded-lg">
                                       <strong className="text-orange-600 dark:text-orange-400">Group Size:</strong> 
-                                      <span className="ml-2">{selectedModule.group_size.min}-{selectedModule.group_size.max} (optimal: {selectedModule.group_size.optimal})</span>
+                                      <span className="ml-2">{selectedModule.groupSize.min}-{selectedModule.groupSize.max} (optimal: {selectedModule.groupSize.optimal})</span>
                                     </div>
                                   </CardContent>
                                 </Card>
                               </div>
 
-                              {selectedModule.mindset_topics && selectedModule.mindset_topics.length > 0 && (
+                              {selectedModule.mindsetTopics && selectedModule.mindsetTopics.length > 0 && (
                                 <Card className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20 border-purple-100 dark:border-purple-800">
                                   <CardHeader className="pb-3">
                                     <CardTitle className="text-purple-700 dark:text-purple-300 flex items-center">
@@ -836,7 +836,7 @@ export function TrainingModulesManagement() {
                                       <div className="bg-white/50 dark:bg-gray-800/50 p-4 rounded-lg">
                                         <h4 className="font-medium mb-3 text-purple-600 dark:text-purple-400">Topics</h4>
                                         <div className="flex flex-wrap gap-2">
-                                          {selectedModule.mindset_topics.map((topic, index) => (
+                                          {selectedModule.mindsetTopics.map((topic, index) => (
                                             <Badge key={index} className="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs">{topic}</Badge>
                                           ))}
                                         </div>
@@ -886,7 +886,7 @@ export function TrainingModulesManagement() {
                         <AlertDialogHeader>
                           <AlertDialogTitle>Delete Training Module</AlertDialogTitle>
                           <AlertDialogDescription>
-                            Are you sure you want to delete "{module.module_title}"? This action cannot be undone.
+                            Are you sure you want to delete "{module.moduleTitle}"? This action cannot be undone.
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>

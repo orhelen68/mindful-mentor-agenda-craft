@@ -73,15 +73,15 @@ export default function CreateAgenda() {
   };
 
   const smartModuleMatching = (req: TrainingRequirement, availableModules: TrainingModule[]): TrainingModule[] => {
-    const mindsetTopics = req.mindset_focus?.primaryTopics || [];
-    const secondaryTopics = req.mindset_focus?.secondaryTopics || [];
+    const mindsetTopics = req.mindsetFocus?.primaryTopics || [];
+    const secondaryTopics = req.mindsetFocus?.secondaryTopics || [];
     const allRequiredTopics = [...mindsetTopics, ...secondaryTopics];
 
     return availableModules
       .map(module => {
         let score = 0;
         const moduleTags = module.tags || [];
-        const mindsetModuleTopics = module.mindset_topics || [];
+        const mindsetModuleTopics = module.mindsetTopics || [];
 
         // Score based on mindset topics match
         mindsetModuleTopics.forEach(topic => {
@@ -182,7 +182,7 @@ export default function CreateAgenda() {
           <CardHeader className="bg-gradient-to-r from-blue-50/50 to-indigo-50/50 dark:from-blue-950/20 dark:to-indigo-950/20 rounded-t-lg">
             <CardTitle className="flex items-center gap-2 bg-gradient-to-r from-blue-700 to-indigo-700 bg-clip-text text-transparent">
               <BookOpen className="h-5 w-5 text-blue-600" />
-              {requirement.training_title}
+              {requirement.trainingTitle}
             </CardTitle>
             <CardDescription>{requirement.description}</CardDescription>
           </CardHeader>
@@ -197,21 +197,21 @@ export default function CreateAgenda() {
               <div className="flex items-center gap-2 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20 p-3 rounded-lg border border-purple-100 dark:border-purple-800">
                 <Users className="h-4 w-4 text-purple-600 dark:text-purple-400" />
                 <span className="text-sm text-purple-700 dark:text-purple-300">
-                  Experience: {requirement.target_audience?.experienceLevel || 'Not specified'}
+                  Experience: {requirement.targetAudience?.experienceLevel || 'Not specified'}
                 </span>
               </div>
               <div className="flex items-center justify-center bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-teal-950/20 dark:to-cyan-950/20 p-3 rounded-lg border border-teal-100 dark:border-teal-800">
                 <Badge className="bg-gradient-to-r from-teal-500 to-cyan-500 text-white">
-                  {requirement.delivery_preferences?.format || 'Any format'}
+                  {requirement.deliveryPreferences?.format || 'Any format'}
                 </Badge>
               </div>
             </div>
             
-            {requirement.mindset_focus?.primaryTopics && (
+            {requirement.mindsetFocus?.primaryTopics && (
               <div className="bg-gradient-to-r from-slate-50 to-gray-50 dark:from-slate-950/20 dark:to-gray-950/20 p-4 rounded-lg border border-slate-100 dark:border-slate-800">
                 <p className="text-sm font-medium mb-3 text-slate-700 dark:text-slate-300">Primary Topics:</p>
                 <div className="flex flex-wrap gap-2">
-                  {requirement.mindset_focus.primaryTopics.map((topic, index) => (
+                  {requirement.mindsetFocus.primaryTopics.map((topic, index) => (
                     <Badge key={index} className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white">
                       {topic}
                     </Badge>

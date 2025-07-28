@@ -121,16 +121,16 @@ export function TrainingRequirementsManagement() {
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
                     <CardTitle className="text-lg line-clamp-2 bg-gradient-to-r from-blue-700 to-indigo-700 bg-clip-text text-transparent">
-                      {requirement.training_title}
+                      {requirement.trainingTitle}
                     </CardTitle>
-                    <p className="text-sm text-muted-foreground mt-1 font-mono">ID: {requirement.training_id}</p>
+                    <p className="text-sm text-muted-foreground mt-1 font-mono">ID: {requirement.trainingID}</p>
                   </div>
                   <div className="flex flex-col gap-2">
                     <Badge className="mb-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white border-0">
-                      {requirement.target_audience.experienceLevel}
+                      {requirement.targetAudience.experienceLevel}
                     </Badge>
                     <Badge variant="outline" className="border-purple-200 text-purple-700 dark:border-purple-700 dark:text-purple-300">
-                      {requirement.delivery_preferences.format}
+                      {requirement.deliveryPreferences.format}
                     </Badge>
                   </div>
                 </div>
@@ -145,7 +145,7 @@ export function TrainingRequirementsManagement() {
                       </div>
                       <div className="flex items-center text-sm bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20 p-2 rounded-lg border border-blue-100 dark:border-blue-800">
                         <Users className="w-4 h-4 mr-2 text-blue-600 dark:text-blue-400" />
-                        <span className="text-blue-700 dark:text-cyan-300">{requirement.delivery_preferences.groupSize}</span>
+                        <span className="text-blue-700 dark:text-cyan-300">{requirement.deliveryPreferences.groupSize}</span>
                       </div>
                     </div>
                     <div className="flex justify-between items-center pt-4 border-t border-gray-100 dark:border-gray-700">
@@ -159,7 +159,7 @@ export function TrainingRequirementsManagement() {
                         <DialogContent className="max-w-5xl max-h-[85vh] overflow-y-auto bg-gradient-to-br from-white to-gray-50/50 dark:from-gray-900 dark:to-gray-800/50">
                           <DialogHeader className="border-b border-gray-100 dark:border-gray-700 pb-4">
                             <DialogTitle className="text-2xl bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                              {selectedRequirement?.training_title}
+                              {selectedRequirement?.trainingTitle}
                             </DialogTitle>
                             <div className="flex gap-3 mt-4">
                               <Button 
@@ -192,7 +192,7 @@ export function TrainingRequirementsManagement() {
                                   <CardContent className="space-y-3 text-sm">
                                     <div className="bg-white/50 dark:bg-gray-800/50 p-3 rounded-lg">
                                       <strong className="text-blue-600 dark:text-blue-400">ID:</strong> 
-                                      <span className="ml-2 font-mono">{selectedRequirement.training_id}</span>
+                                      <span className="ml-2 font-mono">{selectedRequirement.trainingID}</span>
                                     </div>
                                     <div className="bg-white/50 dark:bg-gray-800/50 p-3 rounded-lg">
                                       <strong className="text-blue-600 dark:text-blue-400">Description:</strong> 
@@ -200,11 +200,11 @@ export function TrainingRequirementsManagement() {
                                     </div>
                                     <div className="bg-white/50 dark:bg-gray-800/50 p-3 rounded-lg">
                                       <strong className="text-blue-600 dark:text-blue-400">Industry:</strong> 
-                                      <span className="ml-2">{selectedRequirement.target_audience.industryContext}</span>
+                                      <span className="ml-2">{selectedRequirement.targetAudience.industryContext}</span>
                                     </div>
                                     <div className="bg-white/50 dark:bg-gray-800/50 p-3 rounded-lg">
                                       <strong className="text-blue-600 dark:text-blue-400">Experience Level:</strong> 
-                                      <Badge className="ml-2 bg-gradient-to-r from-emerald-500 to-teal-500">{selectedRequirement.target_audience.experienceLevel}</Badge>
+                                      <Badge className="ml-2 bg-gradient-to-r from-emerald-500 to-teal-500">{selectedRequirement.targetAudience.experienceLevel}</Badge>
                                     </div>
                                   </CardContent>
                                 </Card>
@@ -226,11 +226,11 @@ export function TrainingRequirementsManagement() {
                                     </div>
                                     <div className="bg-white/50 dark:bg-gray-800/50 p-3 rounded-lg">
                                       <strong className="text-orange-600 dark:text-orange-400">Format:</strong> 
-                                      <Badge variant="outline" className="ml-2 border-purple-200 text-purple-700">{selectedRequirement.delivery_preferences.format}</Badge>
+                                      <Badge variant="outline" className="ml-2 border-purple-200 text-purple-700">{selectedRequirement.deliveryPreferences.format}</Badge>
                                     </div>
                                     <div className="bg-white/50 dark:bg-gray-800/50 p-3 rounded-lg">
                                       <strong className="text-orange-600 dark:text-orange-400">Group Size:</strong> 
-                                      <span className="ml-2">{selectedRequirement.delivery_preferences.groupSize} participants</span>
+                                      <span className="ml-2">{selectedRequirement.deliveryPreferences.groupSize} participants</span>
                                     </div>
                                   </CardContent>
                                 </Card>
@@ -247,7 +247,7 @@ export function TrainingRequirementsManagement() {
                                   <div className="bg-white/50 dark:bg-gray-800/50 p-4 rounded-lg">
                                     <h4 className="font-medium mb-3 text-purple-600 dark:text-purple-400">Learning Objectives</h4>
                                     <ul className="space-y-2">
-                                      {selectedRequirement.mindset_focus.learningObjectives.map((objective: string, index: number) => (
+                                      {selectedRequirement.mindsetFocus.learningObjectives.map((objective: string, index: number) => (
                                         <li key={index} className="flex items-start text-sm">
                                           <div className="w-2 h-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
                                           {objective}
@@ -258,16 +258,16 @@ export function TrainingRequirementsManagement() {
                                   <div className="bg-white/50 dark:bg-gray-800/50 p-4 rounded-lg">
                                     <h4 className="font-medium mb-3 text-purple-600 dark:text-purple-400">Primary Topics</h4>
                                     <div className="flex flex-wrap gap-2">
-                                      {selectedRequirement.mindset_focus.primaryTopics.map((topic: string, index: number) => (
+                                      {selectedRequirement.mindsetFocus.primaryTopics.map((topic: string, index: number) => (
                                         <Badge key={index} className="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs">{topic}</Badge>
                                       ))}
                                     </div>
                                   </div>
-                                  {selectedRequirement.mindset_focus.secondaryTopics.length > 0 && (
+                                  {selectedRequirement.mindsetFocus.secondaryTopics.length > 0 && (
                                     <div className="bg-white/50 dark:bg-gray-800/50 p-4 rounded-lg">
                                       <h4 className="font-medium mb-3 text-purple-600 dark:text-purple-400">Secondary Topics</h4>
                                       <div className="flex flex-wrap gap-2">
-                                        {selectedRequirement.mindset_focus.secondaryTopics.map((topic: string, index: number) => (
+                                        {selectedRequirement.mindsetFocus.secondaryTopics.map((topic: string, index: number) => (
                                           <Badge key={index} variant="outline" className="text-xs border-purple-200 text-purple-600 dark:border-purple-700 dark:text-purple-300">{topic}</Badge>
                                         ))}
                                       </div>
@@ -280,11 +280,11 @@ export function TrainingRequirementsManagement() {
                                 <div className="grid grid-cols-2 gap-4">
                                   <div>
                                     <strong className="text-gray-600 dark:text-gray-400">Created:</strong> 
-                                    <p className="mt-1">{new Date(selectedRequirement.created_at).toLocaleString()}</p>
+                                    <p className="mt-1">{new Date(selectedRequirement.createdAt).toLocaleString()}</p>
                                   </div>
                                   <div>
                                     <strong className="text-gray-600 dark:text-gray-400">Updated:</strong> 
-                                    <p className="mt-1">{new Date(selectedRequirement.updated_at).toLocaleString()}</p>
+                                    <p className="mt-1">{new Date(selectedRequirement.updatedAt).toLocaleString()}</p>
                                   </div>
                                 </div>
                               </div>
@@ -309,7 +309,7 @@ export function TrainingRequirementsManagement() {
                         <AlertDialogHeader>
                           <AlertDialogTitle>Delete Training Requirement</AlertDialogTitle>
                           <AlertDialogDescription>
-                            Are you sure you want to delete "{requirement.training_title}"? This action cannot be undone.
+                            Are you sure you want to delete "{requirement.trainingTitle}"? This action cannot be undone.
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
