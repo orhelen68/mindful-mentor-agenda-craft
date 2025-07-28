@@ -239,31 +239,30 @@ RESPONSE FORMAT: Return 3-5 high-quality modules as a valid JSON array following
     }
 
     try {
-      // Convert AI response format to our Supabase training module format
+      // Convert AI response format to our service interface format (camelCase)
       for (const module of parsedModules) {
         const trainingModule = {
-          module_id: module.moduleID || crypto.randomUUID(),
-          module_title: module.moduleTitle,
+          moduleID: module.moduleID || crypto.randomUUID(),
+          moduleTitle: module.moduleTitle,
           description: module.description,
           facilitator: module.facilitator,
           participant: module.participant,
           category: module.category,
           tags: module.tags || [],
           duration: module.duration,
-          delivery_method: module.deliveryMethod,
-          group_size: module.groupSize,
-          mindset_topics: module.mindsetTopics || [],
-          delivery_notes: module.deliveryNotes,
-          sample_materials: module.sampleMaterials || [],
+          deliveryMethod: {
+            format: module.deliveryMethod.format,
+            breakout: (module.deliveryMethod.breakout === 'yes' ? 'yes' : 'no') as 'yes' | 'no',
+          },
+          groupSize: module.groupSize,
+          mindsetTopics: module.mindsetTopics || [],
+          deliveryNotes: module.deliveryNotes,
+          sampleMaterials: module.sampleMaterials || [],
         };
 
-        const { error } = await supabase
-          .from('training_modules')
-          .insert([trainingModule]);
-
-        if (error) {
-          throw error;
-        }
+        // Use the training modules service to add the module
+        const { trainingModulesService } = await import('@/services/trainingModulesService');
+        await trainingModulesService.addTrainingModule(trainingModule);
       }
 
       toast({

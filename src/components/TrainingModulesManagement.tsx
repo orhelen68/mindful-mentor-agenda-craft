@@ -17,25 +17,25 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { AIGeneratedModules } from './AIGeneratedModules';
 
 const trainingModuleSchema = z.object({
-  module_title: z.string().min(1, 'Title is required'),
+  moduleTitle: z.string().min(1, 'Title is required'),
   description: z.string().min(1, 'Description is required'),
   facilitator: z.string().optional(),
   participant: z.string().optional(),
   category: z.string().min(1, 'Category is required'),
   tags: z.array(z.object({ value: z.string() })),
   duration: z.number().min(1, 'Duration must be at least 1 minute'),
-  delivery_method: z.object({
+  deliveryMethod: z.object({
     format: z.string().min(1, 'Format is required'),
     breakout: z.enum(['yes', 'no']),
   }),
-  group_size: z.object({
+  groupSize: z.object({
     min: z.number().min(1),
     max: z.number().min(1),
     optimal: z.number().min(1),
   }),
-  mindset_topics: z.array(z.object({ value: z.string() })),
-  delivery_notes: z.string().optional(),
-  sample_materials: z.array(z.object({
+  mindsetTopics: z.array(z.object({ value: z.string() })),
+  deliveryNotes: z.string().optional(),
+  sampleMaterials: z.array(z.object({
     materialType: z.string(),
     filename: z.string(),
     fileFormat: z.string(),
@@ -61,25 +61,25 @@ export function TrainingModulesManagement() {
   const form = useForm<TrainingModuleFormData>({
     resolver: zodResolver(trainingModuleSchema),
     defaultValues: {
-      module_title: '',
+      moduleTitle: '',
       description: '',
       facilitator: '',
       participant: '',
       category: '',
       tags: [{ value: '' }],
       duration: 60,
-      delivery_method: {
+      deliveryMethod: {
         format: 'exercise',
         breakout: 'no',
       },
-      group_size: {
+      groupSize: {
         min: 6,
         max: 20,
         optimal: 12,
       },
-      mindset_topics: [{ value: '' }],
-      delivery_notes: '',
-      sample_materials: [],
+      mindsetTopics: [{ value: '' }],
+      deliveryNotes: '',
+      sampleMaterials: [],
     },
   });
 
@@ -90,12 +90,12 @@ export function TrainingModulesManagement() {
 
   const { fields: mindsetFields, append: appendMindset, remove: removeMindset } = useFieldArray({
     control: form.control,
-    name: 'mindset_topics' as const,
+    name: 'mindsetTopics' as const,
   });
 
   const { fields: materialFields, append: appendMaterial, remove: removeMaterial } = useFieldArray({
     control: form.control,
-    name: 'sample_materials' as const,
+    name: 'sampleMaterials' as const,
   });
 
   const loadModules = async () => {
@@ -171,7 +171,7 @@ export function TrainingModulesManagement() {
     try {
       // Clean up the data and ensure all required fields are present
       const cleanedData = {
-        moduleTitle: data.module_title,
+        moduleTitle: data.moduleTitle,
         description: data.description,
         facilitator: data.facilitator,
         participant: data.participant,
@@ -179,17 +179,17 @@ export function TrainingModulesManagement() {
         tags: data.tags.map(tag => tag.value).filter(val => val.trim() !== ''),
         duration: data.duration,
         deliveryMethod: {
-          format: data.delivery_method.format,
-          breakout: data.delivery_method.breakout,
+          format: data.deliveryMethod.format,
+          breakout: data.deliveryMethod.breakout,
         },
         groupSize: {
-          min: data.group_size.min,
-          max: data.group_size.max,
-          optimal: data.group_size.optimal,
+          min: data.groupSize.min,
+          max: data.groupSize.max,
+          optimal: data.groupSize.optimal,
         },
-        mindsetTopics: data.mindset_topics.map(topic => topic.value).filter(val => val.trim() !== ''),
-        deliveryNotes: data.delivery_notes,
-        sampleMaterials: data.sample_materials?.filter(material =>
+        mindsetTopics: data.mindsetTopics.map(topic => topic.value).filter(val => val.trim() !== ''),
+        deliveryNotes: data.deliveryNotes,
+        sampleMaterials: data.sampleMaterials?.filter(material =>
           material.materialType && material.filename && material.fileFormat && material.fileUrl
         ).map(material => ({
           materialType: material.materialType,
@@ -222,7 +222,7 @@ export function TrainingModulesManagement() {
     try {
       // Clean up the data and ensure all required fields are present
       const cleanedData = {
-        moduleTitle: data.module_title,
+        moduleTitle: data.moduleTitle,
         description: data.description,
         facilitator: data.facilitator,
         participant: data.participant,
@@ -230,17 +230,17 @@ export function TrainingModulesManagement() {
         tags: data.tags.map(tag => tag.value).filter(val => val.trim() !== ''),
         duration: data.duration,
         deliveryMethod: {
-          format: data.delivery_method.format,
-          breakout: data.delivery_method.breakout,
+          format: data.deliveryMethod.format,
+          breakout: data.deliveryMethod.breakout,
         },
         groupSize: {
-          min: data.group_size.min,
-          max: data.group_size.max,
-          optimal: data.group_size.optimal,
+          min: data.groupSize.min,
+          max: data.groupSize.max,
+          optimal: data.groupSize.optimal,
         },
-        mindsetTopics: data.mindset_topics.map(topic => topic.value).filter(val => val.trim() !== ''),
-        deliveryNotes: data.delivery_notes,
-        sampleMaterials: data.sample_materials?.filter(material =>
+        mindsetTopics: data.mindsetTopics.map(topic => topic.value).filter(val => val.trim() !== ''),
+        deliveryNotes: data.deliveryNotes,
+        sampleMaterials: data.sampleMaterials?.filter(material =>
           material.materialType && material.filename && material.fileFormat && material.fileUrl
         ).map(material => ({
           materialType: material.materialType,
@@ -270,25 +270,25 @@ export function TrainingModulesManagement() {
   const startEdit = (module: TrainingModule) => {
     setEditingModule(module);
     form.reset({
-      module_title: module.moduleTitle,
+      moduleTitle: module.moduleTitle,
       description: module.description,
       facilitator: module.facilitator || '',
       participant: module.participant || '',
       category: module.category,
       tags: module.tags.map(tag => ({ value: tag })),
       duration: module.duration,
-      delivery_method: {
+      deliveryMethod: {
         format: module.deliveryMethod.format,
         breakout: module.deliveryMethod.breakout as 'yes' | 'no',
       },
-      group_size: {
+      groupSize: {
         min: module.groupSize.min,
         max: module.groupSize.max,
         optimal: module.groupSize.optimal,
       },
-      mindset_topics: module.mindsetTopics.map(topic => ({ value: topic })),
-      delivery_notes: module.deliveryNotes || '',
-      sample_materials: module.sampleMaterials || [],
+      mindsetTopics: module.mindsetTopics.map(topic => ({ value: topic })),
+      deliveryNotes: module.deliveryNotes || '',
+      sampleMaterials: module.sampleMaterials || [],
     });
   };
 
@@ -307,7 +307,7 @@ export function TrainingModulesManagement() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormField
             control={form.control}
-            name="module_title"
+            name="moduleTitle"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Module Title</FormLabel>
@@ -400,7 +400,7 @@ export function TrainingModulesManagement() {
 
           <FormField
             control={form.control}
-            name="delivery_method.format"
+            name="deliveryMethod.format"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Format</FormLabel>
@@ -424,7 +424,7 @@ export function TrainingModulesManagement() {
 
           <FormField
             control={form.control}
-            name="delivery_method.breakout"
+            name="deliveryMethod.breakout"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Breakout Sessions</FormLabel>
@@ -448,7 +448,7 @@ export function TrainingModulesManagement() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <FormField
             control={form.control}
-            name="group_size.min"
+            name="groupSize.min"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Min Group Size</FormLabel>
@@ -467,7 +467,7 @@ export function TrainingModulesManagement() {
 
           <FormField
             control={form.control}
-            name="group_size.max"
+            name="groupSize.max"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Max Group Size</FormLabel>
@@ -486,7 +486,7 @@ export function TrainingModulesManagement() {
 
           <FormField
             control={form.control}
-            name="group_size.optimal"
+            name="groupSize.optimal"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Optimal Group Size</FormLabel>
@@ -564,7 +564,7 @@ export function TrainingModulesManagement() {
               <div key={`mindset-${index}`} className="flex gap-2">
                 <FormField
                   control={form.control}
-                  name={`mindset_topics.${index}.value`}
+                  name={`mindsetTopics.${index}.value`}
                   render={({ field: inputField }) => (
                     <FormItem className="flex-1">
                       <FormControl>
@@ -590,7 +590,7 @@ export function TrainingModulesManagement() {
 
         <FormField
           control={form.control}
-          name="delivery_notes"
+          name="deliveryNotes"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Delivery Notes</FormLabel>
