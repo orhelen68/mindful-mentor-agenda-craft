@@ -28,7 +28,7 @@ export function ModuleSelector({
   );
 
   const filteredModules = availableModules.filter(module => {
-    const matchesSearch = module.module_title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    const matchesSearch = module.moduleTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          (module.description || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
                          (module.tags || []).some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
     
@@ -39,7 +39,7 @@ export function ModuleSelector({
 
   const displayModules = showMatched ? 
     filteredModules.filter(module => 
-      matchedModules.some(matched => matched.module_id === module.module_id)
+      matchedModules.some(matched => matched.moduleID === module.moduleID)
     ) : 
     filteredModules;
 
@@ -49,7 +49,7 @@ export function ModuleSelector({
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1 min-w-0">
             <CardTitle className="text-lg leading-tight line-clamp-2">
-              {module.module_title}
+              {module.moduleTitle}
               {isMatched && (
                 <Star className="inline h-4 w-4 ml-2 text-yellow-500 fill-current" />
               )}
@@ -59,10 +59,10 @@ export function ModuleSelector({
                 <Clock className="h-3 w-3" />
                 {module.duration || 'N/A'} min
               </div>
-              {module.group_size?.optimal && (
+              {module.groupSize?.optimal && (
                 <div className="flex items-center gap-1">
                   <Users className="h-3 w-3" />
-                  {module.group_size.optimal} people
+                  {module.groupSize.optimal} people
                 </div>
               )}
             </div>
@@ -104,16 +104,16 @@ export function ModuleSelector({
             </div>
           )}
 
-          {module.mindset_topics && module.mindset_topics.length > 0 && (
+          {module.mindsetTopics && module.mindsetTopics.length > 0 && (
             <div className="flex flex-wrap gap-1">
-              {module.mindset_topics.slice(0, 2).map((topic, index) => (
+              {module.mindsetTopics.slice(0, 2).map((topic, index) => (
                 <Badge key={index} variant="default" className="text-xs">
                   {topic}
                 </Badge>
               ))}
-              {module.mindset_topics.length > 2 && (
+              {module.mindsetTopics.length > 2 && (
                 <Badge variant="default" className="text-xs">
-                  +{module.mindset_topics.length - 2} more
+                  +{module.mindsetTopics.length - 2} more
                 </Badge>
               )}
             </div>
@@ -195,10 +195,10 @@ export function ModuleSelector({
       {displayModules.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {displayModules.map((module) => {
-            const isMatched = matchedModules.some(matched => matched.module_id === module.module_id);
+            const isMatched = matchedModules.some(matched => matched.moduleID === module.moduleID);
             return (
               <ModuleCard
-                key={module.module_id}
+                key={module.moduleID}
                 module={module}
                 isMatched={isMatched}
               />

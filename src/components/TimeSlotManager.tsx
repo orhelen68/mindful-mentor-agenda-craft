@@ -234,11 +234,11 @@ function TimeslotEditor({
               <Select
                 value={details.moduleID || ''}
                 onValueChange={(value) => {
-                  const selectedModule = availableModules.find(m => m.module_id === value);
+                  const selectedModule = availableModules.find(m => m.moduleID === value);
                   if (selectedModule) {
                     handleActivityDetailsChange('module', {
-                      moduleID: selectedModule.module_id,
-                      moduleTitle: selectedModule.module_title,
+                      moduleID: selectedModule.moduleID,
+                      moduleTitle: selectedModule.moduleTitle,
                       duration: selectedModule.duration,
                       facilitator: selectedModule.facilitator,
                       notes: details.notes || ''
@@ -252,8 +252,8 @@ function TimeslotEditor({
                 </SelectTrigger>
                 <SelectContent>
                   {availableModules.map((module) => (
-                    <SelectItem key={module.module_id} value={module.module_id}>
-                      {module.module_title} ({module.duration} min)
+                    <SelectItem key={module.moduleID} value={module.moduleID}>
+                      {module.moduleTitle} ({module.duration} min)
                     </SelectItem>
                   ))}
                 </SelectContent>

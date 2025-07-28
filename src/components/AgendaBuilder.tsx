@@ -26,7 +26,7 @@ interface AgendaBuilderProps {
   requirement: TrainingRequirement;
   availableModules: TrainingModule[];
   matchedModules: TrainingModule[];
-  onSave: (agenda: Omit<TrainingAgendaFormData, 'id' | 'created_at' | 'updated_at'>) => void;
+  onSave: (agenda: Omit<TrainingAgendaFormData, 'id' | 'createdAt' | 'updatedAt'>) => void;
 }
 
 export function AgendaBuilder({ 
@@ -35,7 +35,7 @@ export function AgendaBuilder({
   matchedModules, 
   onSave 
 }: AgendaBuilderProps) {
-  const [agendaTitle, setAgendaTitle] = useState(requirement.training_title);
+  const [agendaTitle, setAgendaTitle] = useState(requirement.trainingTitle);
   const [agendaDescription, setAgendaDescription] = useState(requirement.description);
   const [timeslots, setTimeslots] = useState<Timeslot[]>([]);
   const [facilitatorNotes, setFacilitatorNotes] = useState('');
@@ -47,7 +47,7 @@ export function AgendaBuilder({
   // Initialize with basic structure
   useEffect(() => {
     const targetDuration = requirement.constraints?.duration || 480; // 8 hours default
-    const groupSize = requirement.delivery_preferences?.groupSize || 12;
+    const groupSize = requirement.deliveryPreferences?.groupSize || 12;
     
     // Auto-generate opening timeslot
     const openingSlot: Timeslot = {
@@ -71,7 +71,7 @@ export function AgendaBuilder({
     // Set initial materials based on matched modules
     const initialMaterials = matchedModules
       .flatMap(module => {
-        const materials = module.sample_materials || [];
+        const materials = module.sampleMaterials || [];
         return materials.map(material => 
           typeof material === 'string' ? material : material.filename || 'Material'
         );
@@ -144,22 +144,22 @@ export function AgendaBuilder({
     }
 
     const totalDuration = calculateTotalDuration();
-    const groupSize = requirement.delivery_preferences?.groupSize || 12;
+    const groupSize = requirement.deliveryPreferences?.groupSize || 12;
 
-    const agendaData: Omit<TrainingAgendaFormData, 'id' | 'created_at' | 'updated_at'> = {
-      training_id: requirement.training_id,
-      training_title: agendaTitle,
+    const agendaData: Omit<TrainingAgendaFormData, 'id' | 'createdAt' | 'updatedAt'> = {
+      trainingID: requirement.trainingID,
+      trainingTitle: agendaTitle,
       overview: {
         description: agendaDescription,
-        trainingObjectives: requirement.mindset_focus?.learningObjectives || [],
+        trainingObjectives: requirement.mindsetFocus?.learningObjectives || [],
         totalDuration,
         groupSize
       },
       timeslots,
-      pre_reading: preReading,
-      post_workshop_follow_up: postFollowUp,
-      facilitator_notes: facilitatorNotes,
-      materials_list: materialsNeeded
+      preReading: preReading,
+      postWorkshopFollowUp: postFollowUp,
+      facilitatorNotes,
+      materialsList: materialsNeeded
     };
 
     onSave(agendaData);
@@ -295,8 +295,8 @@ export function AgendaBuilder({
                 activityType: 'module',
                 activityDetails: {
                   module: {
-                    moduleID: module.module_id,
-                    moduleTitle: module.module_title,
+                    moduleID: module.moduleID,
+                    moduleTitle: module.moduleTitle,
                     duration: module.duration || 60,
                     facilitator: module.facilitator,
                     notes: ''
