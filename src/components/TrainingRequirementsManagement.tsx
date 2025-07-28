@@ -527,14 +527,24 @@ export function TrainingRequirementsManagement() {
         onOpenChange={setAiDialogOpen}
         requirement={selectedRequirement || undefined}
         availableModules={[]}
-        onAgendaGenerated={(agenda) => {
+        onAgendaGenerated={async (agenda) => {
           console.log('Agenda generated:', agenda);
-          toast({
-            title: 'Success',
-            description: 'Training agenda generated successfully',
-          });
-          setAiDialogOpen(false);
-          loadAgendas(); // Refresh agendas after generation
+          try {
+            await trainingAgendasService.addTrainingAgenda(agenda);
+            toast({
+              title: 'Success',
+              description: 'Training agenda generated and saved successfully',
+            });
+            setAiDialogOpen(false);
+            await loadAgendas(); // Refresh agendas after saving
+          } catch (error) {
+            console.error('Error saving generated agenda:', error);
+            toast({
+              title: 'Error',
+              description: 'Failed to save the generated agenda. Please try again.',
+              variant: 'destructive',
+            });
+          }
         }}
       />
     </div>
