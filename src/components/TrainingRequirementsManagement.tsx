@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { Trash2, Eye, FileText, Clock, Users, Target, Plus, Zap, Calendar, Edit, BookOpen } from 'lucide-react';
+import { Trash2, Eye, FileText, Clock, Users, Target, Plus, Zap, Calendar, Edit, BookOpen, Brain, User } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { trainingRequirementsService, TrainingRequirement } from '@/services/trainingRequirementsService';
 import { trainingAgendasService, TrainingAgenda } from '@/services/trainingAgendasService';
@@ -187,6 +187,17 @@ export function TrainingRequirementsManagement() {
                     <Badge className="bg-gradient-to-r from-green-500 to-teal-500 text-white border-0">
                       {agenda.timeslots?.length || 0} slots
                     </Badge>
+                    {agenda.isAiGenerated ? (
+                      <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0 text-xs">
+                        <Brain className="w-3 h-3 mr-1" />
+                        AI Generated
+                      </Badge>
+                    ) : (
+                      <Badge variant="outline" className="border-blue-200 text-blue-700 dark:border-blue-700 dark:text-blue-300 text-xs">
+                        <User className="w-3 h-3 mr-1" />
+                        Manual
+                      </Badge>
+                    )}
                   </div>
                 </div>
               </CardHeader>
@@ -527,7 +538,8 @@ export function TrainingRequirementsManagement() {
         onAgendaGenerated={async (agenda) => {
           console.log('Agenda generated:', agenda);
           try {
-            await trainingAgendasService.addTrainingAgenda(agenda);
+            const agendaWithFlag = { ...agenda, isAiGenerated: true };
+            await trainingAgendasService.addTrainingAgenda(agendaWithFlag);
             toast({
               title: 'Success',
               description: 'Training agenda generated and saved successfully',

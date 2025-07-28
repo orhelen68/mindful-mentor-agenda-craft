@@ -124,7 +124,8 @@ export default function CreateAgenda() {
 
   const handleSaveAgenda = async (agendaData: Omit<TrainingAgendaFormData, 'id' | 'created_at' | 'updated_at'>) => {
     try {
-      await trainingAgendasService.addTrainingAgenda(agendaData);
+      const agendaWithFlag = { ...agendaData, isAiGenerated: false };
+      await trainingAgendasService.addTrainingAgenda(agendaWithFlag);
       toast({
         title: "Success",
         description: "Training agenda saved successfully",

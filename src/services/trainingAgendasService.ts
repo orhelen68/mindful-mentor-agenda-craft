@@ -75,6 +75,7 @@ export interface TrainingAgenda {
   facilitatorNotes?: string;
   materialsList?: string[];
   userID?: string;
+  isAiGenerated: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -91,6 +92,7 @@ interface TrainingAgendaDB {
   facilitator_notes?: string;
   materials_list?: string[];
   user_id?: string;
+  is_ai_generated: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -107,6 +109,7 @@ export interface TrainingAgendaFormData {
   facilitatorNotes?: string;
   materialsList?: string[];
   userID?: string;
+  isAiGenerated?: boolean;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -123,6 +126,7 @@ interface TrainingAgendaFormDataDB {
   facilitator_notes?: string;
   materials_list?: string[];
   user_id?: string;
+  is_ai_generated?: boolean;
   created_at?: string;
   updated_at?: string;
 }
@@ -140,6 +144,7 @@ function mapAgendaDBToClient(dbData: TrainingAgendaDB): TrainingAgenda {
     facilitatorNotes: dbData.facilitator_notes,
     materialsList: dbData.materials_list,
     userID: dbData.user_id,
+    isAiGenerated: dbData.is_ai_generated,
     createdAt: dbData.created_at,
     updatedAt: dbData.updated_at,
   };
@@ -157,6 +162,7 @@ function mapAgendaClientToDB(clientData: TrainingAgendaFormData): TrainingAgenda
     facilitator_notes: clientData.facilitatorNotes,
     materials_list: clientData.materialsList,
     user_id: clientData.userID,
+    is_ai_generated: clientData.isAiGenerated,
     created_at: clientData.createdAt,
     updated_at: clientData.updatedAt,
   };

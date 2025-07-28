@@ -46,6 +46,7 @@ export type Database = {
           created_at: string
           facilitator_notes: string | null
           id: string
+          is_ai_generated: boolean
           materials_list: string[] | null
           overview: Json
           post_workshop_follow_up: string[] | null
@@ -60,6 +61,7 @@ export type Database = {
           created_at?: string
           facilitator_notes?: string | null
           id?: string
+          is_ai_generated?: boolean
           materials_list?: string[] | null
           overview: Json
           post_workshop_follow_up?: string[] | null
@@ -74,6 +76,7 @@ export type Database = {
           created_at?: string
           facilitator_notes?: string | null
           id?: string
+          is_ai_generated?: boolean
           materials_list?: string[] | null
           overview?: Json
           post_workshop_follow_up?: string[] | null

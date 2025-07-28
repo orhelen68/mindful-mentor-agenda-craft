@@ -169,6 +169,7 @@ export function TrainingRequirementsForm({ onSuccess }: { onSuccess?: () => void
         postWorkshopFollowUp: agenda.postWorkshopFollowUp,
         facilitatorNotes: agenda.facilitatorNotes,
         materialsList: agenda.materialsList,
+        isAiGenerated: true,
       };
 
       const savedAgenda = await trainingAgendasService.addTrainingAgenda(agendaToSave);
