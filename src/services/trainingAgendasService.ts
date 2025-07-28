@@ -63,8 +63,24 @@ interface Overview {
   groupSize: number;
 }
 
-// Main training agenda interface
+// Client-side interface (camelCase)
 export interface TrainingAgenda {
+  id: string;
+  trainingID: string;
+  trainingTitle: string;
+  overview: Overview;
+  timeslots: Timeslot[];
+  preReading?: string[];
+  postWorkshopFollowUp?: string[];
+  facilitatorNotes?: string;
+  materialsList?: string[];
+  userID?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Database interface (snake_case)
+interface TrainingAgendaDB {
   id: string;
   training_id: string;
   training_title: string;
@@ -79,8 +95,24 @@ export interface TrainingAgenda {
   updated_at: string;
 }
 
-// Form data interface for creating/updating agendas
+// Client-side form interface (camelCase)
 export interface TrainingAgendaFormData {
+  id?: string;
+  trainingID: string;
+  trainingTitle: string;
+  overview: Overview;
+  timeslots: Timeslot[];
+  preReading?: string[];
+  postWorkshopFollowUp?: string[];
+  facilitatorNotes?: string;
+  materialsList?: string[];
+  userID?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+// Database form interface (snake_case)
+interface TrainingAgendaFormDataDB {
   id?: string;
   training_id: string;
   training_title: string;
@@ -95,6 +127,41 @@ export interface TrainingAgendaFormData {
   updated_at?: string;
 }
 
+// Mapping functions for agendas
+function mapAgendaDBToClient(dbData: TrainingAgendaDB): TrainingAgenda {
+  return {
+    id: dbData.id,
+    trainingID: dbData.training_id,
+    trainingTitle: dbData.training_title,
+    overview: dbData.overview,
+    timeslots: dbData.timeslots,
+    preReading: dbData.pre_reading,
+    postWorkshopFollowUp: dbData.post_workshop_follow_up,
+    facilitatorNotes: dbData.facilitator_notes,
+    materialsList: dbData.materials_list,
+    userID: dbData.user_id,
+    createdAt: dbData.created_at,
+    updatedAt: dbData.updated_at,
+  };
+}
+
+function mapAgendaClientToDB(clientData: TrainingAgendaFormData): TrainingAgendaFormDataDB {
+  return {
+    id: clientData.id,
+    training_id: clientData.trainingID,
+    training_title: clientData.trainingTitle,
+    overview: clientData.overview,
+    timeslots: clientData.timeslots,
+    pre_reading: clientData.preReading,
+    post_workshop_follow_up: clientData.postWorkshopFollowUp,
+    facilitator_notes: clientData.facilitatorNotes,
+    materials_list: clientData.materialsList,
+    user_id: clientData.userID,
+    created_at: clientData.createdAt,
+    updated_at: clientData.updatedAt,
+  };
+}
+
 class TrainingAgendasService {
   async getTrainingAgendas(): Promise<TrainingAgenda[]> {
     const { data, error } = await supabase
@@ -107,7 +174,7 @@ class TrainingAgendasService {
       throw error;
     }
 
-    return data || [];
+    return (data || []).map(mapAgendaDBToClient);
   }
 
   async getTrainingAgendaById(id: string): Promise<TrainingAgenda | null> {
@@ -122,7 +189,7 @@ class TrainingAgendasService {
       throw error;
     }
 
-    return data;
+    return data ? mapAgendaDBToClient(data) : null;
   }
 
   async getTrainingAgendaByTrainingId(trainingId: string): Promise<TrainingAgenda | null> {
@@ -137,13 +204,19 @@ class TrainingAgendasService {
       throw error;
     }
 
-    return data;
+    return data ? mapAgendaDBToClient(data) : null;
   }
 
   async addTrainingAgenda(agendaData: Omit<TrainingAgendaFormData, 'id' | 'created_at' | 'updated_at'>): Promise<TrainingAgenda> {
+    const { data: { user } } = await supabase.auth.getUser();
+    const dbData = {
+      ...mapAgendaClientToDB(agendaData as TrainingAgendaFormData),
+      user_id: user?.id,
+    };
+
     const { data, error } = await supabase
       .from('training_agendas')
-      .insert([agendaData])
+      .insert([dbData])
       .select()
       .single();
 
@@ -152,13 +225,15 @@ class TrainingAgendasService {
       throw error;
     }
 
-    return data;
+    return mapAgendaDBToClient(data);
   }
 
   async updateTrainingAgenda(id: string, agendaData: Partial<TrainingAgendaFormData>): Promise<TrainingAgenda> {
+    const dbData = agendaData.trainingID ? mapAgendaClientToDB(agendaData as TrainingAgendaFormData) : agendaData;
+    
     const { data, error } = await supabase
       .from('training_agendas')
-      .update(agendaData)
+      .update(dbData)
       .eq('id', id)
       .select()
       .single();
@@ -168,7 +243,7 @@ class TrainingAgendasService {
       throw error;
     }
 
-    return data;
+    return mapAgendaDBToClient(data);
   }
 
   async deleteTrainingAgenda(id: string): Promise<void> {

@@ -1,6 +1,35 @@
 import { supabase } from '@/integrations/supabase/client';
 
+// Client-side interface (camelCase)
 export interface TrainingRequirement {
+  id: string;
+  trainingID: string;
+  trainingTitle: string;
+  description: string;
+  targetAudience: {
+    experienceLevel: string;
+    industryContext: string;
+  };
+  constraints: {
+    duration: number;
+    interactionLevel: string;
+  };
+  mindsetFocus: {
+    learningObjectives: string[];
+    primaryTopics: string[];
+    secondaryTopics: string[];
+  };
+  deliveryPreferences: {
+    format: string;
+    groupSize: number;
+  };
+  userID?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Database interface (snake_case)
+interface TrainingRequirementDB {
   id: string;
   training_id: string;
   training_title: string;
@@ -27,7 +56,32 @@ export interface TrainingRequirement {
   updated_at: string;
 }
 
+// Client-side input interface (camelCase)
 export interface CreateTrainingRequirementData {
+  trainingID: string;
+  trainingTitle: string;
+  description: string;
+  targetAudience: {
+    experienceLevel: string;
+    industryContext: string;
+  };
+  constraints: {
+    duration: number;
+    interactionLevel: string;
+  };
+  mindsetFocus: {
+    learningObjectives: string[];
+    primaryTopics: string[];
+    secondaryTopics: string[];
+  };
+  deliveryPreferences: {
+    format: string;
+    groupSize: number;
+  };
+}
+
+// Database input interface (snake_case)
+interface CreateTrainingRequirementDataDB {
   training_id: string;
   training_title: string;
   description: string;
@@ -50,6 +104,35 @@ export interface CreateTrainingRequirementData {
   };
 }
 
+// Mapping functions
+function mapDBToClient(dbData: TrainingRequirementDB): TrainingRequirement {
+  return {
+    id: dbData.id,
+    trainingID: dbData.training_id,
+    trainingTitle: dbData.training_title,
+    description: dbData.description,
+    targetAudience: dbData.target_audience,
+    constraints: dbData.constraints,
+    mindsetFocus: dbData.mindset_focus,
+    deliveryPreferences: dbData.delivery_preferences,
+    userID: dbData.user_id,
+    createdAt: dbData.created_at,
+    updatedAt: dbData.updated_at,
+  };
+}
+
+function mapClientToDB(clientData: CreateTrainingRequirementData): CreateTrainingRequirementDataDB {
+  return {
+    training_id: clientData.trainingID,
+    training_title: clientData.trainingTitle,
+    description: clientData.description,
+    target_audience: clientData.targetAudience,
+    constraints: clientData.constraints,
+    mindset_focus: clientData.mindsetFocus,
+    delivery_preferences: clientData.deliveryPreferences,
+  };
+}
+
 class TrainingRequirementsService {
   async getTrainingRequirements(): Promise<TrainingRequirement[]> {
     const { data, error } = await supabase
@@ -62,7 +145,7 @@ class TrainingRequirementsService {
       throw error;
     }
 
-    return data || [];
+    return (data || []).map(mapDBToClient);
   }
 
   async getTrainingRequirement(id: string): Promise<TrainingRequirement | null> {
@@ -77,13 +160,19 @@ class TrainingRequirementsService {
       throw error;
     }
 
-    return data;
+    return data ? mapDBToClient(data) : null;
   }
 
   async addTrainingRequirement(requirementData: CreateTrainingRequirementData): Promise<TrainingRequirement> {
+    const { data: { user } } = await supabase.auth.getUser();
+    const dbData = {
+      ...mapClientToDB(requirementData),
+      user_id: user?.id,
+    };
+
     const { data, error } = await supabase
       .from('training_requirements')
-      .insert([requirementData])
+      .insert([dbData])
       .select()
       .single();
 
@@ -92,13 +181,15 @@ class TrainingRequirementsService {
       throw error;
     }
 
-    return data;
+    return mapDBToClient(data);
   }
 
   async updateTrainingRequirement(id: string, requirementData: Partial<CreateTrainingRequirementData>): Promise<TrainingRequirement> {
+    const dbData = requirementData.trainingID ? mapClientToDB(requirementData as CreateTrainingRequirementData) : requirementData;
+    
     const { data, error } = await supabase
       .from('training_requirements')
-      .update(requirementData)
+      .update(dbData)
       .eq('id', id)
       .select()
       .single();
@@ -108,7 +199,7 @@ class TrainingRequirementsService {
       throw error;
     }
 
-    return data;
+    return mapDBToClient(data);
   }
 
   async deleteTrainingRequirement(id: string): Promise<void> {
