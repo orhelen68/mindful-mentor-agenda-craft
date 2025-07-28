@@ -209,14 +209,22 @@ class TrainingAgendasService {
 
   async addTrainingAgenda(agendaData: Omit<TrainingAgendaFormData, 'id' | 'created_at' | 'updated_at'>): Promise<TrainingAgenda> {
     const { data: { user } } = await supabase.auth.getUser();
-    const dbData = {
-      ...mapAgendaClientToDB(agendaData as TrainingAgendaFormData),
-      user_id: user?.id,
-    };
+    const clientDataWithDefaults = {
+      ...agendaData,
+      id: undefined, // This will be excluded in the mapping
+      createdAt: undefined,
+      updatedAt: undefined,
+      userID: user?.id,
+    } as TrainingAgendaFormData;
+    
+    const dbData = mapAgendaClientToDB(clientDataWithDefaults);
+    
+    // Remove undefined fields to let database handle defaults
+    const { id, created_at, updated_at, ...cleanDbData } = dbData;
 
     const { data, error } = await supabase
       .from('training_agendas')
-      .insert([dbData])
+      .insert([cleanDbData])
       .select()
       .single();
 
