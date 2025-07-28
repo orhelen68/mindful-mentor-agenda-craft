@@ -166,11 +166,14 @@ export function TrainingRequirementsForm({ onSuccess }: { onSuccess?: () => void
       });
       
       // Navigate to create agenda page with the requirement ID
-      if (savedRequirement?.id) {
-        window.location.href = `/create-agenda/${savedRequirement.id}`;
-      } else {
-        window.location.href = '/create-agenda';
-      }
+      // Use a small delay to ensure the sessionStorage is written before navigation
+      setTimeout(() => {
+        if (savedRequirement?.id) {
+          window.location.href = `/create-agenda/${savedRequirement.id}`;
+        } else {
+          window.location.href = '/create-agenda';
+        }
+      }, 100);
     } catch (error) {
       console.error('Error handling AI agenda:', error);
       toast({
