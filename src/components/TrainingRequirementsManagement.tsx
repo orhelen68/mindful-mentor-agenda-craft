@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Trash2, Eye, FileText, Clock, Users, Target, Plus, Zap, Calendar } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { trainingRequirementsService, TrainingRequirement } from '@/services/trainingRequirementsService';
+import { trainingAgendasService } from '@/services/trainingAgendasService';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { AIGeneratedAgendaDialog } from '@/components/AIGeneratedAgendaDialog';
@@ -16,6 +17,7 @@ export function TrainingRequirementsManagement() {
   const [selectedRequirement, setSelectedRequirement] = useState<TrainingRequirement | null>(null);
   const [deleteLoading, setDeleteLoading] = useState<string | null>(null);
   const [aiDialogOpen, setAiDialogOpen] = useState(false);
+  const [viewAgendaLoading, setViewAgendaLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -67,6 +69,33 @@ export function TrainingRequirementsManagement() {
       return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`;
     }
     return `${mins}m`;
+  };
+
+  const handleViewAgenda = async () => {
+    if (!selectedRequirement) return;
+    
+    setViewAgendaLoading(true);
+    try {
+      const agenda = await trainingAgendasService.getTrainingAgendaByTrainingId(selectedRequirement.trainingID);
+      if (agenda) {
+        navigate(`/edit-agenda/${agenda.id}`);
+      } else {
+        toast({
+          title: "No Agenda Found",
+          description: "No training agenda has been created for this requirement yet. Please create one first.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching agenda:', error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch training agenda.",
+        variant: "destructive",
+      });
+    } finally {
+      setViewAgendaLoading(false);
+    }
   };
 
   return (
@@ -169,13 +198,22 @@ export function TrainingRequirementsManagement() {
                                 <Calendar className="w-4 h-4 mr-2" />
                                 Create Training Agenda
                               </Button>
-                              <Button 
+                               <Button 
                                 onClick={() => setAiDialogOpen(true)}
                                 variant="outline"
                                 className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-950/30 dark:to-pink-950/30 border-purple-200 dark:border-purple-700 hover:from-purple-100 hover:to-pink-100 dark:hover:from-purple-900/50 dark:hover:to-pink-900/50"
                               >
                                 <Zap className="w-4 h-4 mr-2" />
                                 AI Generate Training Agenda
+                              </Button>
+                              <Button 
+                                onClick={handleViewAgenda}
+                                variant="outline"
+                                disabled={viewAgendaLoading}
+                                className="bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-950/30 dark:to-blue-950/30 border-cyan-200 dark:border-cyan-700 hover:from-cyan-100 hover:to-blue-100 dark:hover:from-cyan-900/50 dark:hover:to-blue-900/50"
+                              >
+                                <Eye className="w-4 h-4 mr-2" />
+                                {viewAgendaLoading ? 'Loading...' : 'View Agenda'}
                               </Button>
                             </div>
                           </DialogHeader>
