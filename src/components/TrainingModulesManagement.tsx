@@ -929,11 +929,13 @@ export function TrainingModulesManagement() {
       </Dialog>
 
       {/* AI Generator Dialog */}
-      {showAIGenerator && (
-        <AIGeneratedModules 
-          onBack={() => setShowAIGenerator(false)}
-        />
-      )}
+      <Dialog open={showAIGenerator} onOpenChange={setShowAIGenerator}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <AIGeneratedModules 
+            onBack={() => setShowAIGenerator(false)}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
