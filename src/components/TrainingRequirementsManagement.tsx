@@ -199,7 +199,10 @@ export function TrainingRequirementsManagement() {
                                 Create Training Agenda
                               </Button>
                                <Button 
-                                onClick={() => setAiDialogOpen(true)}
+                                onClick={() => {
+                                  console.log('AI Generate clicked');
+                                  setAiDialogOpen(true);
+                                }}
                                 variant="outline"
                                 className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-950/30 dark:to-pink-950/30 border-purple-200 dark:border-purple-700 hover:from-purple-100 hover:to-pink-100 dark:hover:from-purple-900/50 dark:hover:to-pink-900/50"
                               >
@@ -372,6 +375,7 @@ export function TrainingRequirementsManagement() {
         requirement={selectedRequirement || undefined}
         availableModules={[]}
         onAgendaGenerated={(agenda) => {
+          console.log('Agenda generated:', agenda);
           toast({
             title: 'Success',
             description: 'Training agenda generated successfully',
