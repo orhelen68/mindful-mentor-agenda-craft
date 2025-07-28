@@ -259,6 +259,11 @@ function TimeslotEditor({
                 </SelectContent>
               </Select>
             </div>
+            {details.moduleTitle && (
+              <div className="text-sm text-muted-foreground mt-2">
+                Selected: {details.moduleTitle}
+              </div>
+            )}
             {details.facilitator && (
               <div>
                 <Label>Facilitator</Label>
