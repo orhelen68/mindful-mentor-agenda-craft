@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import Index from "./pages/Index";
 import CreateAgenda from "./pages/CreateAgenda";
+import EditAgenda from "./pages/EditAgenda";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -21,6 +22,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/create-agenda" element={<CreateAgenda />} />
             <Route path="/create-agenda/:requirementsId" element={<CreateAgenda />} />
+            <Route path="/edit-agenda/:id" element={<EditAgenda />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

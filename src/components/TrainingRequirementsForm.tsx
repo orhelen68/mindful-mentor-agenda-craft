@@ -15,6 +15,7 @@ import { trainingAgendasService, TrainingAgendaFormData } from '@/services/train
 import { AIGeneratedAgendaDialog } from '@/components/AIGeneratedAgendaDialog';
 import { useToast } from '@/hooks/use-toast';
 import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const trainingRequirementsSchema = z.object({
   trainingID: z.string().min(1, 'Training ID is required'),
@@ -47,6 +48,7 @@ export function TrainingRequirementsForm({ onSuccess }: { onSuccess?: () => void
   const [availableModules, setAvailableModules] = useState<TrainingModule[]>([]);
   const [savedRequirement, setSavedRequirement] = useState<TrainingRequirement | null>(null);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const form = useForm<TrainingRequirementsFormData>({
     resolver: zodResolver(trainingRequirementsSchema),
@@ -157,28 +159,32 @@ export function TrainingRequirementsForm({ onSuccess }: { onSuccess?: () => void
       // Set the dialog to close first
       setShowAIDialog(false);
       
-      // Store the agenda data temporarily for the create agenda page to use
-      sessionStorage.setItem('aiGeneratedAgenda', JSON.stringify(agenda));
+      // Save the agenda directly to Supabase
+      const agendaToSave = {
+        trainingID: savedRequirement?.trainingID || '',
+        trainingTitle: savedRequirement?.trainingTitle || '',
+        overview: agenda.overview,
+        timeslots: agenda.timeslots,
+        preReading: agenda.preReading,
+        postWorkshopFollowUp: agenda.postWorkshopFollowUp,
+        facilitatorNotes: agenda.facilitatorNotes,
+        materialsList: agenda.materialsList,
+      };
+
+      const savedAgenda = await trainingAgendasService.addTrainingAgenda(agendaToSave);
       
       toast({
-        title: "AI Agenda Ready!",
-        description: "Review and save your AI-generated agenda.",
+        title: "Success",
+        description: "AI-generated agenda has been saved and is ready for editing.",
       });
       
-      // Navigate to create agenda page with the requirement ID
-      // Use a small delay to ensure the sessionStorage is written before navigation
-      setTimeout(() => {
-        if (savedRequirement?.id) {
-          window.location.href = `/create-agenda/${savedRequirement.id}`;
-        } else {
-          window.location.href = '/create-agenda';
-        }
-      }, 100);
+      // Navigate to edit the saved agenda
+      navigate(`/edit-agenda/${savedAgenda.id}`);
     } catch (error) {
-      console.error('Error handling AI agenda:', error);
+      console.error('Error saving AI agenda:', error);
       toast({
         title: "Error",
-        description: "Failed to process the AI-generated agenda.",
+        description: "Failed to save AI-generated agenda.",
         variant: "destructive",
       });
     }
