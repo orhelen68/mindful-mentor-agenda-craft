@@ -96,7 +96,7 @@ function SortableTimeslot({
     const details = timeslot.activityDetails;
     switch (timeslot.activityType) {
       case 'module':
-        return timeslot.activityDetails.module?.moduleTitle || 'Module Activity';
+        return details.moduleTitle || 'Module Activity';
       case 'formality':
         return details.formality?.formalityType || 'Formality';
       case 'speaker':
