@@ -270,6 +270,9 @@ function TimeslotEditor({
                 <Input
                   value={details.facilitator || ''}
                   onChange={(e) => handleActivityDetailsChange('module', {
+                    moduleID: details.moduleID,
+                    moduleTitle: details.moduleTitle,
+                    duration: details.duration,
                     ...details,
                     facilitator: e.target.value
                   })}
