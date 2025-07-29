@@ -96,7 +96,7 @@ function SortableTimeslot({
     const details = timeslot.activityDetails;
     switch (timeslot.activityType) {
       case 'module':
-        return details.module?.moduleTitle || 'Module Activity';
+        return timeslot.activityDetails.module?.moduleTitle || 'Module Activity';
       case 'formality':
         return details.formality?.formalityType || 'Formality';
       case 'speaker':
@@ -235,14 +235,17 @@ function TimeslotEditor({
                 value={details.moduleID || ''}
                 onValueChange={(value) => {
                   const selectedModule = availableModules.find(m => m.moduleID === value);
+                  console.log('Selected module:', selectedModule);
                   if (selectedModule) {
-                    handleActivityDetailsChange('module', {
+                    const newDetails = {
                       moduleID: selectedModule.moduleID,
                       moduleTitle: selectedModule.moduleTitle,
                       duration: selectedModule.duration,
-                      facilitator: selectedModule.facilitator,
+                      facilitator: details.facilitator || '',
                       notes: details.notes || ''
-                    });
+                    };
+                    console.log('Setting module details:', newDetails);
+                    handleActivityDetailsChange('module', newDetails);
                     handleFieldChange('duration', selectedModule.duration || 60);
                   }
                 }}
@@ -260,8 +263,13 @@ function TimeslotEditor({
               </Select>
             </div>
             {details.moduleTitle && (
-              <div className="text-sm text-muted-foreground mt-2">
-                Selected: {details.moduleTitle}
+              <div className="text-sm text-foreground mt-2 bg-yellow-100 p-2 rounded">
+                Selected: {details.moduleTitle} (Debug: moduleID={details.moduleID})
+              </div>
+            )}
+            {!details.moduleTitle && details.moduleID && (
+              <div className="text-sm text-red-500 mt-2">
+                Warning: moduleID exists ({details.moduleID}) but no moduleTitle
               </div>
             )}
             {details.facilitator && (
